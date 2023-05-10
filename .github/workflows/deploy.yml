@@ -28,26 +28,29 @@ jobs:
         cache: 'npm'
     
     - name: Setup env
-    - run: npm install -g pnpm
-    - run: pnpm i
+      run: |
+        npm install -g pnpm
+        pnpm i
 
     - name: Generate public files
-    - run: pnpm build
+      run: |
+        pnpm build
 
     - name: Deploy
       env: 
         GH_GIT: git@github.com:Fzlw/workspace.git # 仓库地址
         GH_BRANCH: www # 构建分支
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
-    - run: git config --global user.name "Fzlw"
-    - run: git config --global user.email "1416017757@qq.com"
-    - run: git clone https://${GH_GIT} .deploy_git
-    - run: cd .deploy_git
-    - run: git config --global user.email "1416017757@qq.com"
-    - run: git checkout ${GH_BRANCH}
-    - run: cd ../
-    - run: mv .deploy_git/.git/ ./dist/docs
-    - run: cd ./dist/docs
-    - run: git add .
-    - run: git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
-    - run: git push --force --quiet "https://${ACCESS_TOKEN}@${GH_GIT}" ${GH_BRANCH}:${GH_BRANCH}
+    - run: |
+        git config --global user.name "Fzlw"
+        git config --global user.email "1416017757@qq.com"
+        git clone https://${GH_GIT} .deploy_git
+        cd .deploy_git
+        git config --global user.email "1416017757@qq.com"
+        git checkout ${GH_BRANCH}
+        cd ../
+        mv .deploy_git/.git/ ./dist/docs
+        cd ./dist/docs
+        git add .
+        git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
+        git push --force --quiet "https://${ACCESS_TOKEN}@${GH_GIT}" ${GH_BRANCH}:${GH_BRANCH}
