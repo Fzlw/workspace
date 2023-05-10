@@ -1,0 +1,53 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build and publish www
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Setup env
+    - run: npm install -g pnpm
+    - run: pnpm i
+
+    - name: Generate public files
+    - run: pnpm build
+
+    - name: Deploy
+      env: 
+        GH_GIT: git@github.com:Fzlw/workspace.git # 仓库地址
+        GH_BRANCH: www # 构建分支
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
+    - run: git config --global user.name "Fzlw"
+    - run: git config --global user.email "1416017757@qq.com"
+    - run: git clone https://${GH_GIT} .deploy_git
+    - run: cd .deploy_git
+    - run: git config --global user.email "1416017757@qq.com"
+    - run: git checkout ${GH_BRANCH}
+    - run: cd ../
+    - run: mv .deploy_git/.git/ ./dist/docs
+    - run: cd ./dist/docs
+    - run: git add .
+    - run: git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
+    - run: git push --force --quiet "https://${ACCESS_TOKEN}@${GH_GIT}" ${GH_BRANCH}:${GH_BRANCH}
