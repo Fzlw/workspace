@@ -41,7 +41,7 @@ jobs:
         GH_GIT: git@github.com:Fzlw/workspace.git # 仓库地址
         GH_BRANCH: www # 构建分支
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
-    - run: |
+      run: |
         git config --global user.name "Fzlw"
         git config --global user.email "1416017757@qq.com"
         git clone https://${GH_GIT} .deploy_git
