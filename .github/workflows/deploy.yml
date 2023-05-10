@@ -29,12 +29,11 @@ jobs:
     
     - name: Setup env
       run: |
-        npm install -g pnpm
-        pnpm i
+        npm install
 
     - name: Generate public files
       run: |
-        pnpm build
+        npm run build
 
     - name: Deploy
       env: 
