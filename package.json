@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "sb": "storybook dev -p 6006",
-    "build": "rm -rf ./dist/docs && storybook build -o ./dist/docs"
+    "build:docs": "rm -rf ./dist/docs && storybook build -o ./dist/docs"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "7.0.7",
