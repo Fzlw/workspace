@@ -44,6 +44,10 @@ jobs:
         GH_BRANCH: www # 构建分支
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
       run: |
+        git branch
+        git branch -a
+        git fetch
+        git branch -a 
         git checkout ${GH_BRANCH}
         git add .
         git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
