@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "types": ["element-plus/global"]
-  },
-  "extends": "../../tsconfig.json",
-  "include": ["./**/*.ts", "./**/*.d.ts", "./**/*.vue"],
-}
