@@ -44,11 +44,10 @@ jobs:
         GH_BRANCH: www # 构建分支
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
       run: |
-        git branch
-        git branch -a
+        git config --global user.name "Fzlw"
+        git config --global user.email "1416017757@qq.com"
         git fetch
-        git branch -a 
         git checkout ${GH_BRANCH}
         git add .
         git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
-        git push --force --quiet "https://${ACCESS_TOKEN}@${GH_GIT}" ${GH_BRANCH}:${GH_BRANCH}
+        git push --force
