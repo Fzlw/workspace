@@ -14,5 +14,6 @@
   },
   "peerDependencies": {
     "element-plus": "^2.3.4"
-  }
+  },
+  "homepage": "https://fzlw.github.io/workspace/"
 }

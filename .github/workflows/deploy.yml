@@ -43,6 +43,7 @@ jobs:
     - name: Deploy
       env: 
         GH_BRANCH: gh-pages # 构建分支
+      # touch .nojekyll https://github.com/vercel/next.js/issues/2029
       run: |
         git config --global user.name "Fzlw"
         git config --global user.email "1416017757@qq.com"
@@ -50,6 +51,7 @@ jobs:
         git checkout ${GH_BRANCH} -f
         rm -rf ./*
         mv ../.temp/* ./
+        touch .nojekyll
         git add .
         git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
         git push --force
