@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "types": ["element-plus/global"]
+    "types": ["element-plus/global"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
   },
   "extends": "../../tsconfig.json",
-  "include": ["./**/*.ts", "./**/*.d.ts", "./**/*.vue"],
+  "include": ["./src/*.vue", "./src/*.ts", "./types/*.d.ts"],
 }
