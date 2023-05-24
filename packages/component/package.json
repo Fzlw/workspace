@@ -1,19 +1,39 @@
 {
-  "name": "@fz/one",
+  "name": "@fzlw/eui-plus",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "module": "es/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node ./build.js"
   },
-  "keywords": [],
+  "types": "es/index.d.ts",
+  "keywords": [
+    "element-plus",
+    "json form",
+    "json table",
+    "vue"
+  ],
+  "files": [
+    "es"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://fzlw.github.io/workspace/",
+  "dependencies": {
+    "el-table-infinite-scroll": "^3.0.1",
+    "element-plus": "^2.3.4",
+    "lodash-es": "^4.17.21"
+  },
   "devDependencies": {
-    "element-plus": "^2.3.4"
-  },
-  "peerDependencies": {
-    "element-plus": "^2.3.4"
-  },
-  "homepage": "https://fzlw.github.io/workspace/"
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@types/lodash-es": "^4.17.7",
+    "@vitejs/plugin-vue": "^4.2.1",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.23.0",
+    "rollup-plugin-typescript2": "^0.34.1"
+  }
 }

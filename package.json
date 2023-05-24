@@ -3,8 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "sb": "storybook dev -p 6006",
-    "build:docs": "rm -rf ./dist/docs && storybook build -o ./dist/docs"
+    "dev": "storybook dev -p 6006",
+    "build:docs": "rm -rf ./dist/docs && storybook build -o ./dist/docs",
+    "build:component": "npx pnpm --stream --filter @fz/one build",
+    "lint": "eslint --ext .js,.jsx,.vue,.ts,.tsx --fix"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "7.0.7",
@@ -15,7 +17,18 @@
     "@storybook/testing-library": "0.0.14-next.2",
     "@storybook/vue3": "7.0.7",
     "@storybook/vue3-vite": "7.0.7",
+    "@typescript-eslint/eslint-plugin": "^5.59.5",
+    "@typescript-eslint/parser": "^5.59.5",
     "@vitejs/plugin-vue": "^4.2.1",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "@vue/eslint-config-typescript": "^11.0.3",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "eslint-plugin-vue": "^9.12.0",
+    "prettier": "^2.8.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "storybook": "7.0.7",
