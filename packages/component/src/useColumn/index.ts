@@ -1,4 +1,4 @@
-import { h, Slots } from 'vue'
+import { h, Slots, toRaw } from 'vue'
 import {
   FormProps,
   ElInput,
@@ -24,7 +24,8 @@ import {
   RemoteColumn,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
-import { isEmpty, isObject } from 'lodash-es'
+import { isUndefined, isEmpty } from 'lodash-es'
+import { formatOption, valueMapTo } from '../utils'
 
 export type NonRType = NonNullable<Column['rType']>
 export type NonModel = NonNullable<FormProps['model']>
@@ -65,13 +66,32 @@ export const useColumn = () => {
   }
 
   const renderSelect: RenderColumn<SelectColumn> = (model, i) => {
+    const { labelKey = 'label', valueMap, ...other } = i
+    const { valueKey = 'value' } = other
+
     return h(
       ElSelect,
       {
-        ...i,
+        ...other,
         modelValue: model[i.prop],
         'onUpdate:modelValue': (value) => {
           model[i.prop] = value
+
+          if (!isEmpty(valueMap)) {
+            if (Array.isArray(value)) {
+              valueMapTo(
+                model,
+                i.options.filter((o) => value.includes(o[valueKey])),
+                valueMap
+              )
+            } else {
+              valueMapTo(
+                model,
+                i.options.find((o) => o[valueKey] === value),
+                valueMap
+              )
+            }
+          }
         },
       },
       {
@@ -79,6 +99,8 @@ export const useColumn = () => {
           i.options.map((option, index) => {
             return h(ElOption, {
               ...option,
+              value: option[valueKey],
+              label: option[labelKey as keyof typeof option] as string,
               key: index,
             })
           }),
@@ -146,42 +168,27 @@ export const useColumn = () => {
 
   const renderRemote: RenderColumn<RemoteColumn> = (model, i) => {
     const { valueMap, ...other } = i
+    const modelValue = model[i.prop]
+    const rawModel = toRaw(model)
+    const vK = i.prop ?? 'value'
+    const lK = i.labelKey ?? 'label'
+    const options = isUndefined(modelValue)
+      ? void 0
+      : Array.isArray(modelValue)
+      ? modelValue.map((val, j) =>
+          formatOption({ ...rawModel, [vK]: val, [lK]: rawModel[lK]?.[j] }, i.prop, i.labelKey, i.renderLabel)
+        )
+      : [formatOption(rawModel, i.prop, i.labelKey, i.renderLabel)]
 
     return h(OneRemoteSelect, {
+      defaultOptions: options,
       ...other,
       modelValue: model[i.prop],
       'onUpdate:modelValue': (value: any) => {
         model[i.prop] = value
       },
       onChangeMap(value: any | any[]) {
-        if (!isEmpty(valueMap)) {
-          for (const key in valueMap) {
-            const modelKey = valueMap[key]
-
-            if (Array.isArray(value)) {
-              for (let i = 0, len = value.length; i < len; i++) {
-                const val = value[i]
-                const v = isObject(val) ? val[key as keyof object] : void 0
-
-                if (Array.isArray(modelKey)) {
-                  modelKey.forEach((k) => {
-                    model[k] = (i === 0 ? [] : model[k]).concat(v)
-                  })
-                } else {
-                  model[modelKey] = (i === 0 ? [] : model[modelKey]).concat(v)
-                }
-              }
-            } else {
-              const v = isObject(value) ? value[key as keyof object] : void 0
-
-              if (Array.isArray(modelKey)) {
-                modelKey.forEach((k) => (model[k] = v))
-              } else {
-                model[modelKey] = v
-              }
-            }
-          }
-        }
+        valueMapTo(model, value, valueMap)
       },
     })
   }

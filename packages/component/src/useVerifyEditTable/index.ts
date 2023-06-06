@@ -15,7 +15,7 @@ export interface VerifyTableState<T> extends TableState<T> {
   ref: (instance: FormInstance | null) => void
 }
 
-export const useVerifyEditTable = <T extends EditTableRow>(opts: UseVerifyEditTableOptions<T>) => {
+export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTableOptions<T>) {
   const renderColumn = useColumn()
   const { tableState, editRow, delRow, cancelRow, saveRow, addRow, ...other } = useEditTable<T>({
     mapColumn(i) {
@@ -30,6 +30,7 @@ export const useVerifyEditTable = <T extends EditTableRow>(opts: UseVerifyEditTa
               ElFormItem,
               {
                 ...formItemProps,
+                label: '',
               },
               { default: () => renderColumn(row, other) ?? '' }
             )
@@ -90,24 +91,29 @@ export const useVerifyEditTable = <T extends EditTableRow>(opts: UseVerifyEditTa
     }
   }
 
-  const vAddRow: typeof addRow = (row) => {
+  const vAddRow = (row?: T) => {
     if (verifyTableState.model) return
 
-    addRow(row)
+    const newRow = addRow(row)
+
+    verifyTableState.model = newRow
+
+    return newRow
   }
 
-  const getEditingRow = () => {
-    return unref(verifyTableState.model)
+  const hasEditingRow = () => {
+    return !!unref(verifyTableState.model)
   }
 
   return {
+    verifyTableState,
+    form: verifyForm,
     editRow: vEditRow,
     delRow: vDelRow,
     cancelRow: vCancelRow,
     saveRow: vSaveRow,
     addRow: vAddRow,
-    tableState: verifyTableState,
-    getEditingRow,
+    hasEditingRow,
     ...other,
   }
 }

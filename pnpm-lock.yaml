@@ -69,6 +69,8 @@ importers:
       '@types/lodash-es': ^4.17.7
       '@vitejs/plugin-vue': ^4.2.1
       '@vitejs/plugin-vue-jsx': ^3.0.1
+      '@vue/shared': ^3.3.4
+      csstype: ^3.1.2
       el-table-infinite-scroll: ^3.0.1
       element-plus: ^2.3.4
       lodash-es: ^4.17.21
@@ -84,6 +86,8 @@ importers:
       '@types/lodash-es': 4.17.7
       '@vitejs/plugin-vue': 4.2.1
       '@vitejs/plugin-vue-jsx': 3.0.1
+      '@vue/shared': 3.3.4
+      csstype: 3.1.2
       rimraf: 5.0.1
       rollup: 3.23.0
       rollup-plugin-typescript2: 0.34.1_rollup@3.23.0
@@ -3789,6 +3793,10 @@ packages:
 
   /@vue/shared/3.3.0-beta.3:
     resolution: {integrity: sha512-st1SnB/Bkbb9TsieeI4TRX9TqHYIR5wvIma3ZtEben55EYSWa1q5u2BhTNgABSdH+rv3Xwfrvpwh5PmCw6Y53g==}
+    dev: true
+
+  /@vue/shared/3.3.4:
+    resolution: {integrity: sha512-7OjdcV8vQ74eiz1TZLzZP4JwqM5fA94K6yntPS5Z25r9HDuGNzaGdgvwKYq6S+MxwF0TFRwe50fIR/MYnakdkQ==}
     dev: true
 
   /@vueuse/core/9.13.0:

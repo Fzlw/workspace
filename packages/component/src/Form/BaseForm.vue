@@ -52,32 +52,27 @@ import { useColumn } from '../useColumn'
 
 export default defineComponent({
   props: {
+    model: { type: Object, required: true, default: () => ({}) },
     columns: { type: Array, required: true },
   },
-  setup(_props, { attrs }) {
+  setup(_props) {
     const oneForm = ref()
-
-    const formState = attrs.model ?? {}
 
     const renderColumn = useColumn()
 
-    return {
-      oneForm,
-      formState,
-      renderColumn,
-    }
+    return { oneForm, renderColumn }
   },
   render() {
-    const { formState, $attrs, columns, renderColumn } = this
+    const { model, $attrs, columns, renderColumn } = this
 
     return (
-      <ElForm {...$attrs} ref='oneForm'>
+      <ElForm {...$attrs} model={model} ref='oneForm'>
         {columns.map((i) => {
           const { formItemProps, ...other } = i
 
           return (
             <ElFormItem key={i.prop} {...formItemProps}>
-              {renderColumn(formState, other, this.$slots)}
+              {renderColumn(model, other, this.$slots)}
             </ElFormItem>
           )
         })}

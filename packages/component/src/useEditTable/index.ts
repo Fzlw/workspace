@@ -78,10 +78,16 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     const newRow: T = { _editing: true, ...(row ?? null), _origin: void 0 }
 
     tableState.data.push(newRow)
+
+    return newRow
   }
 
   const rowIsEditing = (row: T) => {
     return !!row._editing
+  }
+
+  const rowIsAdded = (row: T) => {
+    return isUndefined(row._origin)
   }
 
   /**
@@ -127,5 +133,6 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     addRow,
     rowIsEditing,
     getChangedRows,
+    rowIsAdded,
   }
 }
