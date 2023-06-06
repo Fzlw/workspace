@@ -1,6 +1,6 @@
-import { ref, computed, ComputedRef } from 'vue'
+import { ref, computed, ComputedRef, unref, Ref, toRaw } from 'vue'
 import { isUndefined, cloneDeep } from 'lodash-es'
-import { FormItemProps } from 'element-plus'
+import { FormItemProps, FormInstance } from 'element-plus'
 import { FormColumn as OriginFormColumn } from '../Form'
 import { ExpandColumn, ExcludeColumn } from '../useColumn'
 
@@ -13,8 +13,10 @@ export type UseFormColumn = ExpandColumn<
   }
 >
 export interface FormState<T> {
+  submitting: boolean
   columns: OriginFormColumn[]
   model: T
+  ref: (instance: FormInstance | null) => void
 }
 
 type FormColumn = ExpandColumn<OriginFormColumn, { _hidden?: boolean }>
@@ -47,33 +49,47 @@ export const formatFormColumn = (column: UseFormColumn) => {
   return newColumn
 }
 
+export interface UseFormOptions<T> {
+  columns: UseFormColumn[]
+  initData?: Partial<T>
+}
+
+export type SubmitPost<T> = (model: T) => any
+
 /**
- * 会产生编译错误 超过最大推导栈
+ * TODO: 会产生编译错误 超过最大推导栈
  */
 // @ts-ignore
-export function useForm<T extends object>(opts: {
-  columns: UseFormColumn[]
-  initData?: T
-}): {
+export function useForm<T extends object>(
+  opts: UseFormOptions<T>
+): {
   formState: ComputedRef<FormState<T>>
   getColumn(prop: UseFormColumn['prop']): FormColumn | null
   setColumn(prop: UseFormColumn['prop'], obj: Partial<UseFormColumn> | null, newVal?: any): void
-  hideColumn(prop: UseFormColumn['prop']): void
-  showColumn(prop: UseFormColumn['prop']): void
-  toggleColumn(prop: UseFormColumn['prop']): void
+  toggleColumn(prop: UseFormColumn['prop'] | UseFormColumn['prop'][], state?: boolean): void
+  submit(post: SubmitPost<T>): Promise<void>
+  setModel(obj: Partial<T>, reset?: boolean): void
+  form: Ref<FormInstance | null>
+  getModel<K extends keyof T = keyof T>(key: K): T[K]
 }
 
-export function useForm<T extends object>(opts: { columns: UseFormColumn[]; initData?: T }) {
+export function useForm<T extends object>(opts: UseFormOptions<T>) {
   const model = ref<T>({ ...(opts.initData ?? null) } as T)
   const columns = ref<FormColumn[]>(opts.columns.map((i) => formatFormColumn(i)))
 
+  const formRef = ref<FormInstance | null>(null)
+  const submitting = ref(false)
   const formState = computed<FormState<T>>(() => {
     // @ts-ignore
     const list = columns.value.filter((i) => !i._hidden) as OriginFormColumn[]
 
     return {
+      submitting: submitting.value,
       model: model.value,
       columns: list,
+      ref(instance) {
+        formRef.value = instance
+      },
     }
   })
 
@@ -102,36 +118,55 @@ export function useForm<T extends object>(opts: { columns: UseFormColumn[]; init
     }
   }
 
-  const toggleColumn = (prop: UseFormColumn['prop']) => {
-    const column = getColumn(prop)
+  const toggleColumn = (prop: UseFormColumn['prop'] | UseFormColumn['prop'][], state?: boolean) => {
+    const props = Array.isArray(prop) ? prop : [prop]
 
-    if (column) {
-      column._hidden = !column._hidden
+    for (const i of columns.value) {
+      if (props.includes(i.prop)) {
+        i._hidden = !state ?? !i._hidden
+      }
     }
   }
 
-  const hideColumn = (prop: UseFormColumn['prop']) => {
-    const column = getColumn(prop)
+  const submit = async (post?: (model: T) => any) => {
+    try {
+      submitting.value = true
 
-    if (column) {
-      column._hidden = true
+      const valid = (await formRef.value?.validate()) ?? true
+
+      if (valid && post) await post(toRaw(unref(model)))
+
+      submitting.value = false
+    } catch (error) {
+      submitting.value = false
+
+      throw error
     }
   }
 
-  const showColumn = (prop: UseFormColumn['prop']) => {
-    const column = getColumn(prop)
-
-    if (column) {
-      column._hidden = false
+  const setModel = (obj: Partial<T>, isReset = false) => {
+    if (isReset) {
+      model.value = obj
+      // @ts-ignore
+      columns.value = opts.columns.map((i) => formatFormColumn(i))
+      formRef.value?.clearValidate()
+      return
     }
+    model.value = { ...model.value, ...obj }
+  }
+
+  const getModel = (key: keyof T) => {
+    return model.value[key]
   }
 
   return {
     formState,
     getColumn,
     setColumn,
-    hideColumn,
-    showColumn,
     toggleColumn,
+    submit,
+    setModel,
+    form: formRef,
+    getModel,
   }
 }

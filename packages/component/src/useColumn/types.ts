@@ -1,5 +1,4 @@
 import {
-  FormProps,
   InputNumberInstance,
   DatePickerProps,
   InputInstance,
@@ -29,16 +28,20 @@ export interface NumberColumn extends BaseColumn, ExtProps<InputNumberInstance['
   rType: 'number'
 }
 
-export interface DateColumn extends BaseColumn, ExtProps<DatePickerProps> {
+export interface DateColumn extends BaseColumn, Partial<DatePickerProps> {
   rType: 'date'
   onChange?: (val: DatePickerProps['modelValue']) => void
 }
 
+export type ValueMap = Record<string, string | string[]>
 export type SelectProps = InstanceType<typeof ElSelect>['$props']
 export type ElOptionProps = InstanceType<typeof ElOption>['$props']
+export type SelectColumnOption = Omit<ElOptionProps, 'value'> & { value?: ElOptionProps['value']; [key: string]: any }
 export interface SelectColumn extends BaseColumn, SelectProps {
   rType: 'select'
-  options: ElOptionProps[]
+  options: SelectColumnOption[]
+  labelKey?: string
+  valueMap?: ValueMap
 }
 
 type ElRadioGroupProps = InstanceType<typeof ElRadioGroup>['$props']
@@ -55,7 +58,7 @@ export interface CheckboxColumn extends BaseColumn, CheckBoxGroupProps {
   options: (Omit<ElCheckboxProps, 'modelValue'> & { value: ElCheckboxProps['modelValue'] })[]
 }
 
-export type CustomScope = Pick<FormProps, 'model'>
+export type CustomScope<T = any> = { model: T }
 
 export interface CustomColumn extends BaseColumn {
   rType: 'custom'
@@ -75,7 +78,10 @@ export interface RemoteColumn extends BaseColumn, SelectProps {
     query: [p: Pagination, keyword?: string, params?: RemoteColumn['params']]
   ) => BaseResult<any> | Promise<BaseResult<any>>
   renderLabel?: (i: any) => ElOptionProps['label']
-  valueMap?: Record<string, string | string[]>
+  valueMap?: ValueMap
+  labelKey?: string
+  noCache?: boolean
+  defaultOptions?: ElOptionProps[]
 }
 
 export type Column =

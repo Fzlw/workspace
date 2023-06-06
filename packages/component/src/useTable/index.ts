@@ -16,12 +16,12 @@ export enum Format {
 export type UseTableColumn<T> = TableColumn<T> & { defaultValue?: string; rFormat?: Format }
 
 export type TableState<T = unknown> = Pick<OneTableProps<T>, 'data' | 'columns'> &
-  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & { pagination: Pagination; mode: LoadMode }
+  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & { mode: LoadMode }
 
 export interface UseTableOptions<T, K> {
   columns: K[]
   query: (p: Pagination) => BaseResult<T> | Promise<BaseResult<T>>
-  pagination?: Pagination
+  pagination?: Partial<Pagination>
   mode?: LoadMode
   mapColumn?: (i: K) => K
 }
@@ -33,6 +33,20 @@ export const defaultFormatter = (cellValue: any, format?: Format, defaultValue?:
 }
 
 export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opts: UseTableOptions<T, K>) => {
+  const pagination: Pagination = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: 0,
+    pageSizes: [10, 20, 30, 40, 50],
+    layout: 'sizes, total, prev, pager, next, jumper',
+    'onUpdate:pageSize'(val: number) {
+      pagination.pageSize = val
+    },
+    'onUpdate:currentPage'(val: number) {
+      pagination.currentPage = val
+    },
+    ...opts.pagination,
+  })
   const tableState: TableState<T> = reactive({
     loading: false,
     data: [],
@@ -52,11 +66,14 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
       )
     }),
     mode: opts.mode ?? LoadMode.single,
-    pagination: {
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      ...opts.pagination,
+    // 同 Table 组件事件
+    onNext() {
+      if (tableState.mode === LoadMode.infinite) {
+        handleNext()
+      }
+    },
+    'onUpdate:selected'(list: T[]) {
+      tableState.selected = list
     },
   })
 
@@ -66,12 +83,12 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     try {
       tableState.loading = true
 
-      const result = await opts.query(unref(tableState.pagination))
+      const result = await opts.query(unref(pagination))
       const { list = [], total = 0 } = result ?? {}
-      const page = tableState.pagination.page
+      const page = pagination.currentPage
 
       tableState.data = page === 1 || tableState.mode === LoadMode.single ? list : tableState.data.concat(list)
-      tableState.pagination.total = total || list.length
+      pagination.total = total || list.length
     } catch (error) {
       console.error(error)
     }
@@ -80,17 +97,18 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   }
 
   const handleNext = () => {
-    const { page, pageSize, total = 0 } = tableState.pagination
+    const { currentPage, pageSize, total = 0 } = pagination
 
-    if (!tableState.loading && page * pageSize < total) {
-      tableState.pagination.page = page + 1
+    if (!tableState.loading && currentPage * pageSize < total) {
+      pagination.currentPage = currentPage + 1
     }
   }
 
-  watch(() => [tableState.pagination.page, tableState.pagination.pageSize], handleQuery)
+  watch(() => [pagination.currentPage], handleQuery)
 
   return {
     tableState,
+    pagination,
     handleQuery,
     handleNext,
   }

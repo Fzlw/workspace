@@ -1,6 +1,6 @@
 {
   "name": "@fzlw/eui-plus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "module": "es/index.js",
   "scripts": {
@@ -32,6 +32,8 @@
     "@types/lodash-es": "^4.17.7",
     "@vitejs/plugin-vue": "^4.2.1",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@vue/shared": "^3.3.4",
+    "csstype": "^3.1.2",
     "rimraf": "^5.0.1",
     "rollup": "^3.23.0",
     "rollup-plugin-typescript2": "^0.34.1"
