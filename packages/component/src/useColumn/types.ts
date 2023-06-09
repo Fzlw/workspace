@@ -13,14 +13,13 @@ import { Pagination, BaseResult } from '../types'
 
 export type ExtProps<T, K extends keyof T = any> = Partial<Omit<T, K>>
 
-export const el: InputColumn = { prop: '' }
-
 export interface BaseColumn {
   prop: string
 }
 
 export interface InputColumn extends BaseColumn, ExtProps<InputInstance['$props'], 'label'> {
   rType?: 'text'
+  rows?: number
   elProps?: Partial<InputInstance['$props']>
 }
 

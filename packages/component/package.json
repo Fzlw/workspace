@@ -1,10 +1,11 @@
 {
   "name": "@fzlw/eui-plus",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "",
   "module": "es/index.js",
   "scripts": {
-    "build": "node ./build.js"
+    "build": "node ./build.js",
+    "pb": "npm run build && npm publish"
   },
   "types": "es/index.d.ts",
   "keywords": [
@@ -17,14 +18,15 @@
     "es"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "author": "",
   "license": "MIT",
   "homepage": "https://fzlw.github.io/workspace/",
   "dependencies": {
     "el-table-infinite-scroll": "^3.0.1",
-    "element-plus": "^2.3.4",
+    "element-plus": "^2.2.6",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

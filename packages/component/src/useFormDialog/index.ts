@@ -9,7 +9,7 @@ export type UseFormDialogOptions<T> = UseFormOptions<T> & {
 }
 
 export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
-  const { formState, ...other } = useForm<T>(opts)
+  const { formState, getModel, ...other } = useForm<T>(opts)
   const visible = ref(false)
   const dialogProps = ref({})
 
@@ -53,5 +53,6 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     show,
     hide,
     submit,
+    getModel,
   }
 }
