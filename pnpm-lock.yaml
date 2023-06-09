@@ -72,7 +72,7 @@ importers:
       '@vue/shared': ^3.3.4
       csstype: ^3.1.2
       el-table-infinite-scroll: ^3.0.1
-      element-plus: ^2.3.4
+      element-plus: ^2.2.6
       lodash-es: ^4.17.21
       rimraf: ^5.0.1
       rollup: ^3.23.0
