@@ -6,4 +6,10 @@ export interface OneTableProps<T = unknown> extends TableProps<T> {
   columns: TableColumn<T>[]
   loading?: boolean
   selected?: T[]
+  mode?: LoadMode
+}
+
+export enum LoadMode {
+  single,
+  infinite,
 }
