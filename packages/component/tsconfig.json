@@ -6,7 +6,8 @@
     "baseUrl": ".",
     "paths": {
       "@vue/shared": ["./node_modules/@vue/shared/dist/shared"],
-      "csstype": ["./node_modules/csstype/index"]
+      "csstype": ["./node_modules/csstype/index"],
+      "el-table-infinite-scroll": ["./node_modules/el-table-infinite-scroll/lib/index"]
     },
   },
   "extends": "../../tsconfig.json",

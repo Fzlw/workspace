@@ -1,5 +1,6 @@
 import { Pagination } from '../types'
-import { LoadMode, UseTableColumn, UseTableOptions, useTable } from '../useTable'
+import { LoadMode } from '../Table'
+import { UseTableColumn, UseTableOptions, useTable } from '../useTable'
 import { UseFormOptions, useForm } from '../useForm'
 import { useFormDialog, UseFormDialogOptions } from '../useFormDialog'
 import { BaseResult, LayoutCommand, CommandItem } from '../types'
@@ -96,7 +97,6 @@ export function useLayout<T extends object, Q extends object = object, K extends
     pagination,
 
     query,
-    resetQuery: queryOpera.reset,
     command,
 
     setForm: formOpera.setModel,

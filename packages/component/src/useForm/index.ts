@@ -16,7 +16,8 @@ export interface FormState<T> {
   submitting: boolean
   columns: OriginFormColumn[]
   model: T
-  ref: (instance: FormInstance | null) => void
+  // FIXME: 修复 tsconfig.json strict: true 下报错的问题
+  ref?: any
 }
 
 type FormColumn = ExpandColumn<OriginFormColumn, { _hidden?: boolean }>
@@ -87,7 +88,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
       submitting: submitting.value,
       model: model.value,
       columns: list,
-      ref(instance) {
+      ref(instance: any) {
         formRef.value = instance
       },
     }

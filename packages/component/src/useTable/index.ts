@@ -1,12 +1,7 @@
 import { Pagination, BaseResult } from '../types'
-import { OneTableProps, TableColumn } from '../Table/index'
+import { OneTableProps, TableColumn, LoadMode } from '../Table/index'
 import { reactive, unref, watch } from 'vue'
 import { dayjs } from 'element-plus'
-
-export enum LoadMode {
-  single,
-  infinite,
-}
 
 export enum Format {
   dateTime,
