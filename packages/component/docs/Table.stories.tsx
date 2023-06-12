@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { onMounted } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import React from 'react'
 import { ElPagination } from 'element-plus'
 
@@ -263,6 +263,53 @@ export const 可选择列表: Story = {
         <div>当前已选择数：{{ tableState.selected.length }}</div>
         <Table v-bind="tableState" height=300 />
         <ElPagination v-bind="pagination" />
+      `,
+    }
+  },
+}
+
+/**
+ * 打开控制台查看
+ */
+export const 获取ElTable组件实例: Story = {
+  render: () => {
+    return {
+      components: { Table },
+      setup() {
+        type Data = { date: string; name: string; address: string }
+
+        const { tableState, handleQuery, table } = useTable<Data>({
+          columns: [
+            { label: 'Date', prop: 'date', rFormat: Format.dateTime },
+            { label: 'Name', prop: 'name' },
+            { label: 'Address', prop: 'address' },
+          ],
+          query() {
+            return new Promise((r) => {
+              setTimeout(() => {
+                const list = new Array(10).fill(0).map(() => ({
+                  date: new Date().toString(),
+                  name: 'name',
+                  address: Math.random().toString(),
+                }))
+
+                r({ list, total: 100 })
+              }, 1000)
+            })
+          },
+        })
+
+        onMounted(handleQuery)
+        onMounted(() => {
+          nextTick(() => {
+            console.log('组件实例：', table.value)
+          })
+        })
+
+        return { tableState }
+      },
+      template: `
+        <Table v-bind="tableState" height=300 />
       `,
     }
   },

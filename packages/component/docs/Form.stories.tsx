@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { OneForm as Form, useForm, CustomScope } from '../src'
-import { ref, reactive, toRaw } from 'vue'
+import { ref, reactive, toRaw, onMounted, nextTick } from 'vue'
 import React from 'react'
 import { FormInstance, ElButton } from 'element-plus'
 
@@ -563,6 +563,58 @@ export const 下拉选项映射: Story = {
               },
             },
           ],
+        })
+
+        return { formState }
+      },
+      template: `
+        <Form v-bind="formState">
+        </Form>
+      `,
+    }
+  },
+}
+
+/**
+ * 打开控制台查看
+ */
+export const 获取ElForm组件实例: Story = {
+  render() {
+    return {
+      components: { Form },
+      setup() {
+        const { formState, form } = useForm({
+          columns: [
+            {
+              label: '下拉框',
+              prop: 'selectVal',
+              rType: 'select',
+              valueKey: 'id',
+              labelKey: 'name',
+              valueMap: { eqp_list: 'eqpList', remark: 'remarkremark' },
+              options: [
+                {
+                  name: 'm-lw',
+                  eqp_area_id: 6,
+                  remark: 'test21212111111111',
+                  id: 2,
+                  create_time: '2023-06-02 11:21:15',
+                  update_time: '2023-06-05 09:56:27',
+                  eqp_total: 7,
+                  eqp_list: [{ id: 3, number: 'lw3', status: 4 }],
+                },
+              ],
+              onChange(v) {
+                console.log('onChange', v)
+              },
+            },
+          ],
+        })
+
+        onMounted(() => {
+          nextTick(() => {
+            console.log(`组件实例：`, form.value)
+          })
         })
 
         return { formState }

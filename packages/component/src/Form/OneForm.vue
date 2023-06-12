@@ -1,32 +1,42 @@
-<template>
-  <BaseForm v-bind="{ ...props, ...$attrs }" ref="form">
-    <template v-for="(_, name) in $slots" v-slot:[name]="data">
-      <slot :name="name" v-bind="data" />
-    </template>
-  </BaseForm>
-</template>
+<script lang="tsx">
+import { defineComponent, ref } from 'vue'
+import type { PropType } from 'vue'
+import { ElForm, ElFormItem } from 'element-plus'
+import type { FormInstance } from 'element-plus'
+import { useColumn, NonModel } from '../useColumn'
+import type { FormColumn } from './types'
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { FormInstance } from 'element-plus'
-import BaseForm from './BaseForm.vue'
-import { NonModel } from '../useColumn'
-import { FormColumn } from './types'
+export default defineComponent({
+  props: {
+    model: { type: Object as PropType<NonModel>, required: true },
+    columns: { type: Array as PropType<FormColumn[]>, required: true },
+  },
+  setup(_props) {
+    const elForm = ref<FormInstance>()
 
-export interface Props {
-  model: NonModel
-  columns: FormColumn[]
-}
+    const renderColumn = useColumn()
 
-const props = defineProps<Props>()
+    return {
+      elForm,
+      renderColumn,
+    }
+  },
+  render() {
+    const { $slots, $attrs, model, columns, renderColumn } = this
 
-const form = ref<{ oneForm: FormInstance }>({} as any)
+    return (
+      <ElForm {...$attrs} model={model} ref='elForm'>
+        {columns.map((i) => {
+          const { formItemProps, ...other } = i
 
-const validate: FormInstance['validate'] = (cb) => form.value.oneForm.validate(cb)
-const validateField: FormInstance['validateField'] = (props, cb) => form.value.oneForm.validateField(props, cb)
-const resetFields: FormInstance['resetFields'] = (props) => form.value.oneForm.resetFields(props)
-const scrollToField: FormInstance['scrollToField'] = (prop) => form.value.oneForm.scrollToField(prop)
-const clearValidate: FormInstance['clearValidate'] = (props) => form.value.oneForm.clearValidate(props)
-
-defineExpose({ validate, validateField, resetFields, scrollToField, clearValidate })
+          return (
+            <ElFormItem key={i.prop} {...formItemProps}>
+              {renderColumn(model, other, $slots)}
+            </ElFormItem>
+          )
+        })}
+      </ElForm>
+    )
+  },
+})
 </script>
