@@ -1,5 +1,5 @@
 import { isUndefined } from 'lodash-es'
-import { h, reactive, ref, toRefs, unref } from 'vue'
+import { h, reactive, ref, unref } from 'vue'
 import { ElFormItem, FormInstance, FormValidateFailure } from 'element-plus'
 import { ExpandColumn, ExcludeColumn, useColumn } from '../useColumn'
 import { UseFormColumn, formatFormColumn } from '../useForm'
@@ -11,8 +11,9 @@ export type UseVerifyEditTableColumn<T> = ExpandColumn<UseEditTableColumn<T>, Ex
 export type UseVerifyEditTableOptions<T> = UseTableOptions<T, UseVerifyEditTableColumn<T>>
 
 export interface VerifyTableState<T> extends TableState<T> {
+  tableState: TableState<T>
   model: T | null
-  ref: (instance: FormInstance | null) => void
+  ref?: any
 }
 
 export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTableOptions<T>) {
@@ -48,10 +49,10 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
   const verifyForm = ref<FormInstance | null>(null)
   // @ts-ignore
   const verifyTableState: VerifyTableState<T> = reactive({
-    ...toRefs(tableState),
+    tableState,
     model: null,
-    ref(instance) {
-      verifyForm.value = instance
+    ref(instance: any) {
+      verifyForm.value = instance?.elForm
     },
   })
 

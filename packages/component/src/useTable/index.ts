@@ -1,7 +1,7 @@
 import { Pagination, BaseResult } from '../types'
 import { OneTableProps, TableColumn, LoadMode } from '../Table/index'
-import { reactive, unref, watch } from 'vue'
-import { dayjs } from 'element-plus'
+import { reactive, unref, watch, ref } from 'vue'
+import { dayjs, TableInstance } from 'element-plus'
 
 export enum Format {
   dateTime,
@@ -28,6 +28,7 @@ export const defaultFormatter = (cellValue: any, format?: Format, defaultValue?:
 }
 
 export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opts: UseTableOptions<T, K>) => {
+  const tableRef = ref<TableInstance | null>(null)
   const pagination: Pagination = reactive({
     currentPage: 1,
     pageSize: 20,
@@ -70,6 +71,9 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     'onUpdate:selected'(list: T[]) {
       tableState.selected = list
     },
+    ref(instance: any) {
+      tableRef.value = instance?.elTable
+    },
   })
 
   const handleQuery = async () => {
@@ -104,6 +108,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   return {
     tableState,
     pagination,
+    table: tableRef,
     handleQuery,
     handleNext,
   }

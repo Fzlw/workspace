@@ -89,7 +89,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
       model: model.value,
       columns: list,
       ref(instance: any) {
-        formRef.value = instance
+        formRef.value = instance?.elForm
       },
     }
   })
