@@ -1,6 +1,6 @@
 import { useTable, UseTableColumn, defaultFormatter, UseTableOptions, TableState } from '../useTable'
 import { Column, useColumn, ExpandColumn } from '../useColumn'
-import { cloneDeep, isUndefined } from 'lodash-es'
+import { cloneDeep, isUndefined, isEqual } from 'lodash-es'
 import { readonly, computed, reactive, unref } from 'vue'
 
 export type UseEditTableColumn<T> = ExpandColumn<Column, UseTableColumn<T> & { editable?: boolean }>
@@ -100,14 +100,18 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
 
     for (const i of tableState.data) {
       if (i._delete) {
-        removed.push(unref(i))
-      } else if (isUndefined(i._origin)) {
-        added.push(unref(i))
+        if (!rowIsAdded(i)) {
+          removed.push(unref(i))
+        }
       } else {
-        for (const key in i._origin) {
-          if (i._origin[key] !== i[key]) {
-            changed.push(unref(i))
-            break
+        if (rowIsAdded(i)) {
+          added.push(unref(i))
+        } else {
+          for (const key in i._origin) {
+            if (!isEqual(i[key], i._origin[key])) {
+              changed.push(unref(i))
+              break
+            }
           }
         }
       }
