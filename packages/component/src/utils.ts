@@ -11,7 +11,7 @@ export const mapTo = <T>(list: { label: string; value: T }[], defaultValue = '-'
 
   list.forEach((i) => map.set(i.value, i.label))
 
-  return (val?: T) => (val === void 0 ? defaultValue : map.get(val) ?? String(val) ?? defaultValue)
+  return (val?: T) => map.get(val as any) ?? val ?? defaultValue
 }
 
 /**

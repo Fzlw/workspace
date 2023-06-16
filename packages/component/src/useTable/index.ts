@@ -21,9 +21,12 @@ export interface UseTableOptions<T, K> {
   mapColumn?: (i: K) => K
 }
 
+export const formatToDatetime = (val: any) => dayjs(val).format('YYYY-MM-DD HH:mm:ss')
+export const formatToDate = (val: any) => dayjs(val).format('YYYY-MM-DD')
+
 export const defaultFormatter = (cellValue: any, format?: Format, defaultValue?: string) => {
-  if (format === Format.dateTime && cellValue) return dayjs(cellValue).format('YYYY-MM-DD HH:mm:ss')
-  if (format === Format.date && cellValue) return dayjs(cellValue).format('YYYY-MM-DD')
+  if (format === Format.dateTime && cellValue) return formatToDatetime(cellValue)
+  if (format === Format.date && cellValue) return formatToDate(cellValue)
   if (cellValue === '') return defaultValue
 }
 
