@@ -114,9 +114,9 @@ const query = async () => {
 }
 
 const next = () => {
-  const { currentPage, pageSize, total = 0 } = pagination
+  const { total = 0 } = pagination
 
-  if (!loading.value && inited.value && currentPage * pageSize < total) {
+  if (!loading.value && inited.value && options.value.length < total) {
     pagination.currentPage += 1
     query()
   }
