@@ -84,29 +84,25 @@ export const formatOption = (i: any, vk?: string, lk?: string, rL?: RemoteColumn
 export const valueMapTo = (model: NonModel, value: any | any[], valueMap?: ValueMap) => {
   if (!isEmpty(valueMap)) {
     for (const key in valueMap) {
-      const modelKey = valueMap[key]
+      const modelKeys = (Array.isArray(valueMap[key]) ? valueMap[key] : [valueMap[key]]) as string[]
 
       if (Array.isArray(value)) {
-        for (let i = 0, len = value.length; i < len; i++) {
-          const val = value[i]
-          const v = isObject(val) ? val[key as keyof object] : void 0
+        if (value.length > 0) {
+          for (let i = 0, len = value.length; i < len; i++) {
+            const val = value[i]
+            const v = isObject(val) ? val[key as keyof object] : void 0
 
-          if (Array.isArray(modelKey)) {
-            modelKey.forEach((k) => {
+            modelKeys.forEach((k) => {
               model[k] = (i === 0 ? [] : model[k]).concat(v)
             })
-          } else {
-            model[modelKey] = (i === 0 ? [] : model[modelKey]).concat(v)
           }
+        } else {
+          modelKeys.forEach((k) => (model[k] = []))
         }
       } else {
         const v = isObject(value) ? value[key as keyof object] : void 0
 
-        if (Array.isArray(modelKey)) {
-          modelKey.forEach((k) => (model[k] = v))
-        } else {
-          model[modelKey] = v
-        }
+        modelKeys.forEach((k) => (model[k] = v))
       }
     }
   }
