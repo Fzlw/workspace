@@ -79,11 +79,11 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     },
   })
 
-  const handleQuery = async () => {
+  const handleQuery = async (disabledLoading = false) => {
     if (!opts.query || tableState.loading) return
 
     try {
-      tableState.loading = true
+      !disabledLoading && (tableState.loading = true)
 
       const result = await opts.query(unref(pagination))
       const { list = [], total = 0 } = result ?? {}
@@ -106,7 +106,10 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     }
   }
 
-  watch(() => [pagination.currentPage], handleQuery)
+  watch(
+    () => [pagination.currentPage],
+    () => handleQuery()
+  )
 
   return {
     tableState,
