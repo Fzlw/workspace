@@ -8,6 +8,7 @@ import {
   ElRadio,
   ElCheckboxGroup,
   ElCheckbox,
+  SwitchProps,
 } from 'element-plus'
 import { Pagination, BaseResult } from '../types'
 
@@ -64,6 +65,10 @@ export interface CustomColumn extends BaseColumn {
   render?: (scope: CustomScope) => JSX.Element
 }
 
+export interface SwitchColumn extends BaseColumn, Partial<SwitchProps> {
+  rType: 'switch'
+}
+
 // 没用
 export interface RemoteOption extends ElOptionProps {
   _origin: any
@@ -92,6 +97,7 @@ export type Column =
   | RadioColumn
   | CheckboxColumn
   | RemoteColumn
+  | SwitchColumn
 
 export type ExpandColumn<T, K extends object> = T extends BaseColumn ? T & K : never
 

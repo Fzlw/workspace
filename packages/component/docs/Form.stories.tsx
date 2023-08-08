@@ -154,6 +154,14 @@ export const 配合useForm使用: Story = {
                 { label: '选择5', value: 5 },
               ],
             },
+            {
+              label: '开关',
+              rType: 'switch',
+              prop: 'switch',
+              inlinePrompt: true,
+              activeText: '是',
+              inactiveText: '否',
+            },
           ],
         })
 
