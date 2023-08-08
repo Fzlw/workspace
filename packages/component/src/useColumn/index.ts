@@ -10,6 +10,7 @@ import {
   ElRadioGroup,
   ElCheckboxGroup,
   ElCheckbox,
+  ElSwitch,
 } from 'element-plus'
 import {
   NumberColumn,
@@ -22,6 +23,7 @@ import {
   CustomColumn,
   BaseColumn,
   RemoteColumn,
+  SwitchColumn,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
 import { isUndefined, isEmpty } from 'lodash-es'
@@ -193,6 +195,16 @@ export const useColumn = () => {
     })
   }
 
+  const renderSwitch: RenderColumn<SwitchColumn> = (model, i) => {
+    return h(ElSwitch, {
+      ...i,
+      modelValue: model[i.prop],
+      'onUpdate:modelValue': (value) => {
+        model[i.prop] = value
+      },
+    })
+  }
+
   const renderMap: Record<NonNullable<Column['rType']>, RenderColumn<any>> = {
     number: renderNumber,
     date: renderDate,
@@ -202,6 +214,7 @@ export const useColumn = () => {
     custom: renderCustom,
     text: renderInput,
     remote: renderRemote,
+    switch: renderSwitch,
   }
 
   const renderColumn = (model: NonModel, i: Column, slots?: Slots) => {
