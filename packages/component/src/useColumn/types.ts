@@ -58,21 +58,16 @@ export interface CheckboxColumn extends BaseColumn, CheckBoxGroupProps {
   options: (Omit<ElCheckboxProps, 'modelValue'> & { value: ElCheckboxProps['modelValue'] })[]
 }
 
-export type CustomScope<T = any> = { model: T }
+export type CustomScope<T = any> = { model: T; state: CustomColumn['state'] }
 
 export interface CustomColumn extends BaseColumn {
   rType: 'custom'
+  state?: Record<string, any>
   render?: (scope: CustomScope) => JSX.Element
 }
 
 export interface SwitchColumn extends BaseColumn, Partial<SwitchProps> {
   rType: 'switch'
-}
-
-// 没用
-export interface RemoteOption extends ElOptionProps {
-  _origin: any
-  [k: string]: any
 }
 
 export interface RemoteColumn extends BaseColumn, SelectProps {

@@ -24,6 +24,7 @@ import {
   BaseColumn,
   RemoteColumn,
   SwitchColumn,
+  CustomScope,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
 import { isUndefined, isEmpty } from 'lodash-es'
@@ -163,7 +164,7 @@ export const useColumn = () => {
   }
 
   const renderCustom: RenderColumn<CustomColumn> = (model, i, slots) => {
-    const scope = { model }
+    const scope: CustomScope = { model, state: i.state ?? {} }
 
     return (slots?.[i.prop]?.(scope) ?? i.render?.(scope) ?? null) as any
   }
