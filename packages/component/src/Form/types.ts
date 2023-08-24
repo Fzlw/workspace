@@ -4,7 +4,7 @@ import { ExpandColumn, Column, NonModel } from '../useColumn'
 
 export type FormColumn = ExpandColumn<
   Column,
-  { formItemProps: Partial<FormItemProps> & { class?: unknown; style?: CSSProperties } }
+  { formItemProps: Partial<FormItemProps> & { class?: string; style?: CSSProperties } }
 >
 
 export interface OneFormProps extends /* @vue-ignore */ Partial<FormProps> {

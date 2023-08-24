@@ -1,5 +1,5 @@
 import { ref, computed, ComputedRef, unref, Ref, toRaw } from 'vue'
-import { isUndefined, cloneDeep } from 'lodash-es'
+import { isUndefined, cloneDeep, isObject } from 'lodash-es'
 import { FormItemProps, FormInstance } from 'element-plus'
 import { FormColumn as OriginFormColumn } from '../Form'
 import { ExpandColumn, ExcludeColumn } from '../useColumn'
@@ -67,7 +67,10 @@ export function useForm<T extends object>(
   formState: ComputedRef<FormState<T>>
   getColumn(prop: UseFormColumn['prop']): FormColumn | null
   setColumn(prop: UseFormColumn['prop'], obj: Partial<UseFormColumn> | null, newVal?: any): void
-  toggleColumn(prop: UseFormColumn['prop'] | UseFormColumn['prop'][], state?: boolean): void
+  toggleColumn(
+    prop: UseFormColumn['prop'] | UseFormColumn['prop'][] | Record<UseFormColumn['prop'], boolean>,
+    state?: boolean
+  ): void
   submit(post: SubmitPost<T>): Promise<void>
   setModel(obj: Partial<T>, reset?: boolean): void
   form: Ref<FormInstance | null>
@@ -119,7 +122,19 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     }
   }
 
-  const toggleColumn = (prop: UseFormColumn['prop'] | UseFormColumn['prop'][], state?: boolean) => {
+  const toggleColumn = (
+    prop: UseFormColumn['prop'] | UseFormColumn['prop'][] | Record<UseFormColumn['prop'], boolean>,
+    state?: boolean
+  ) => {
+    if (isObject(prop) && !Array.isArray(prop)) {
+      for (const i of columns.value) {
+        if (i.prop in prop) {
+          i._hidden = prop[i.prop]
+        }
+      }
+      return
+    }
+
     const props = Array.isArray(prop) ? prop : [prop]
 
     for (const i of columns.value) {
