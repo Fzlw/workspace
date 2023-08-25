@@ -11,7 +11,7 @@ export enum Format {
 export type UseTableColumn<T> = TableColumn<T> & { defaultValue?: string; rFormat?: Format }
 
 export type TableState<T = unknown> = Pick<OneTableProps<T>, 'data' | 'columns'> &
-  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & { mode: LoadMode }
+  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & { mode: LoadMode; pending: boolean }
 
 export interface UseTableOptions<T, K> {
   columns: K[]
@@ -48,6 +48,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   })
   const tableState: TableState<T> = reactive({
     loading: false,
+    pending: false,
     data: [],
     selected: [],
     columns: opts.columns.map((i) => {
@@ -80,9 +81,10 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   })
 
   const handleQuery = async (disabledLoading = false) => {
-    if (!opts.query || tableState.loading) return
+    if (!opts.query || tableState.pending) return
 
     try {
+      tableState.pending = true
       !disabledLoading && (tableState.loading = true)
 
       const result = await opts.query(unref(pagination))
@@ -95,6 +97,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
       console.error(error)
     }
 
+    tableState.pending = false
     tableState.loading = false
   }
 
@@ -103,6 +106,14 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
 
     if (!tableState.loading && currentPage * pageSize < total) {
       pagination.currentPage = currentPage + 1
+    }
+  }
+
+  const setState = (obj: Partial<Pick<TableState<T>, 'data' | 'loading' | 'mode' | 'selected'>>) => {
+    for (const key in obj) {
+      if (key in tableState) {
+        tableState[key as keyof typeof tableState] = obj[key as keyof typeof obj] as never
+      }
     }
   }
 
@@ -117,5 +128,6 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     table: tableRef,
     handleQuery,
     handleNext,
+    setState,
   }
 }

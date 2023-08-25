@@ -15,7 +15,7 @@ export type UseEditTableOptions<T> = UseTableOptions<T, UseEditTableColumn<T>>
 
 export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, UseEditTableColumn<T>>) => {
   const renderColumn = useColumn()
-  const { tableState, ...other } = useTable<T, UseEditTableColumn<T>>({
+  const { tableState, setState, ...other } = useTable<T, UseEditTableColumn<T>>({
     mapColumn(i) {
       const { formatter, editable, ...other } = i
 
@@ -59,6 +59,8 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   }
 
   const cancelRow = (row: T) => {
+    if (rowIsAdded(row)) return delRow(row)
+
     for (const key in row._origin) {
       row[key as keyof T] = row._origin[key]
     }
@@ -77,7 +79,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     // @ts-ignore
     const newRow: T = { _editing: true, ...(row ?? null), _origin: void 0 }
 
-    tableState.data.push(newRow)
+    setState({ data: tableState.data.concat(newRow) })
 
     return newRow
   }
@@ -138,5 +140,6 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     rowIsEditing,
     getChangedRows,
     rowIsAdded,
+    setState,
   }
 }
