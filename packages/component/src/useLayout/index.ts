@@ -62,7 +62,7 @@ export function useLayout<T extends object, Q extends object = object, K extends
         break
 
       case LayoutCommand.export:
-        eM?.(unref(queryState.value.model), unref(pagination))
+        eM?.(unref(queryState.model), unref(pagination))
         break
     }
   }
@@ -72,7 +72,7 @@ export function useLayout<T extends object, Q extends object = object, K extends
   const { tableState, handleQuery, pagination } = useTable<T, K>({
     columns: commands ? columns.concat(renderCommand(commands, command) as K) : columns,
     mode: mode ?? LoadMode.single,
-    query: (p) => get(unref(queryState.value.model), p),
+    query: (p) => get(unref(queryState.model), p),
     pagination: pa,
   })
 
@@ -82,13 +82,15 @@ export function useLayout<T extends object, Q extends object = object, K extends
   })
 
   const query = () => {
-    queryOpera.submit(handleQuery)
+    queryOpera.submit(() => handleQuery())
   }
 
   const { formDialogState, ...formOpera } = useFormDialog<T>({
     columns: formColumns,
     post: noop,
   })
+
+  const resetQuery = () => queryOpera.setModel({}, true)
 
   return {
     tableState,
@@ -102,5 +104,6 @@ export function useLayout<T extends object, Q extends object = object, K extends
     setForm: formOpera.setModel,
     showDialog: formOpera.show,
     hideialog: formOpera.hide,
+    resetQuery,
   }
 }

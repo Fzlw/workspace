@@ -6,6 +6,7 @@ import { Format, useLayout, OneTable, LayoutCommand, OneFormDialog, OneForm } fr
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
+ * 目前为TODO状态 未来阶段可能会修改或移除
  * 提供基本的布局响应式状态
  * 包括查询、新增、修改、删除、导出
  * 不提供具体的页面布局组件
