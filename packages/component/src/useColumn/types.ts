@@ -53,8 +53,13 @@ export interface RadioColumn extends BaseColumn, ElRadioGroupProps {
 
 type CheckBoxGroupProps = InstanceType<typeof ElCheckboxGroup>['$props']
 type ElCheckboxProps = InstanceType<typeof ElCheckbox>['$props']
-export interface CheckboxColumn extends BaseColumn, CheckBoxGroupProps {
+export interface CheckboxColumn extends BaseColumn, ElCheckboxProps {
   rType: 'checkbox'
+  options?: (Omit<ElCheckboxProps, 'modelValue'> & { value: ElCheckboxProps['modelValue'] })[]
+}
+
+export interface CheckboxGroupColumn extends BaseColumn, CheckBoxGroupProps {
+  rType: 'checkboxGroup'
   options: (Omit<ElCheckboxProps, 'modelValue'> & { value: ElCheckboxProps['modelValue'] })[]
 }
 
@@ -93,6 +98,7 @@ export type Column =
   | CheckboxColumn
   | RemoteColumn
   | SwitchColumn
+  | CheckboxGroupColumn
 
 export type ExpandColumn<T, K extends object> = T extends BaseColumn ? T & K : never
 

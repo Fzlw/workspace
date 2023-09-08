@@ -10,7 +10,7 @@ export type UseVerifyEditTableColumn<T> = ExpandColumn<UseEditTableColumn<T>, Ex
 
 export type UseVerifyEditTableOptions<T> = UseTableOptions<T, UseVerifyEditTableColumn<T>>
 
-export interface VerifyTableState<T> extends TableState<T> {
+export interface VerifyTableState<T> {
   tableState: TableState<T>
   model: T | null
   ref?: any
@@ -47,7 +47,6 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
   })
 
   const verifyForm = ref<FormInstance | null>(null)
-  // @ts-ignore
   const verifyTableState: VerifyTableState<T> = reactive({
     tableState,
     model: null,

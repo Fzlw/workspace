@@ -25,6 +25,7 @@ import {
   RemoteColumn,
   SwitchColumn,
   CustomScope,
+  CheckboxGroupColumn,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
 import { isUndefined, isEmpty } from 'lodash-es'
@@ -138,6 +139,20 @@ export const useColumn = () => {
   }
 
   const renderCheckbox: RenderColumn<CheckboxColumn> = (model, i) => {
+    if (Array.isArray(i.options) && i.options.length > 0) {
+      return renderCheckboxGroup(model, i as unknown as CheckboxGroupColumn)
+    }
+
+    return h(ElCheckbox, {
+      ...i,
+      modelValue: model[i.prop],
+      'onUpdate:modelValue': (value) => {
+        model[i.prop] = value
+      },
+    })
+  }
+
+  const renderCheckboxGroup: RenderColumn<CheckboxGroupColumn> = (model, i) => {
     return h(
       ElCheckboxGroup,
       {
@@ -211,6 +226,7 @@ export const useColumn = () => {
     date: renderDate,
     select: renderSelect,
     checkbox: renderCheckbox,
+    checkboxGroup: renderCheckboxGroup,
     radio: renderRadio,
     custom: renderCustom,
     text: renderInput,

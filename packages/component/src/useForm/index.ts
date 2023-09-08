@@ -1,12 +1,12 @@
-import { ref, computed, ComputedRef, unref, Ref, toRaw } from 'vue'
-import { isUndefined, cloneDeep, isObject } from 'lodash-es'
+import { ref, unref, toRaw, reactive, shallowReactive } from 'vue'
+import { isUndefined, cloneDeep } from 'lodash-es'
 import { FormItemProps, FormInstance } from 'element-plus'
 import { FormColumn as OriginFormColumn } from '../Form'
 import { ExpandColumn, ExcludeColumn } from '../useColumn'
 
 export type UseFormColumn = ExpandColumn<
   ExcludeColumn<OriginFormColumn, 'formItemProps'>,
-  Partial<Pick<FormItemProps, 'label' | 'labelWidth' | 'rules'>> & {
+  Partial<Omit<FormItemProps, 'prop' | 'required'>> & {
     hidden?: boolean
     requiredMsg?: string
     formItemProps?: OriginFormColumn['formItemProps']
@@ -20,14 +20,13 @@ export interface FormState<T> {
   ref?: any
 }
 
-type FormColumn = ExpandColumn<OriginFormColumn, { _hidden?: boolean }>
+type FormColumn = ExpandColumn<OriginFormColumn, { hidden?: boolean }>
 
 export const formatFormColumn = (column: UseFormColumn) => {
-  const { prop, formItemProps, label, labelWidth, rules, requiredMsg, hidden, ...other } = column
+  const { prop, formItemProps, label, labelWidth, rules, requiredMsg, ...other } = column
 
   const newColumn: FormColumn = {
     ...other,
-    _hidden: hidden,
     prop,
     formItemProps: {
       prop,
@@ -57,48 +56,27 @@ export interface UseFormOptions<T> {
 
 export type SubmitPost<T> = (model: T) => any
 
-/**
- * TODO: 会产生编译错误 超过最大推导栈
- */
-// @ts-ignore
-export function useForm<T extends object>(
-  opts: UseFormOptions<T>
-): {
-  formState: ComputedRef<FormState<T>>
-  getColumn(prop: UseFormColumn['prop']): FormColumn | null
-  setColumn(prop: UseFormColumn['prop'], obj: Partial<UseFormColumn> | null, newVal?: any): void
-  toggleColumn(
-    prop: UseFormColumn['prop'] | UseFormColumn['prop'][] | Record<UseFormColumn['prop'], boolean>,
-    state?: boolean
-  ): void
-  submit(post: SubmitPost<T>): Promise<void>
-  setModel(obj: Partial<T>, reset?: boolean): void
-  form: Ref<FormInstance | null>
-  getModel<K extends keyof T = keyof T>(key: K): T[K]
-}
-
 export function useForm<T extends object>(opts: UseFormOptions<T>) {
-  const model = ref<T>({ ...(opts.initData ?? null) } as T)
-  const columns = ref<FormColumn[]>(opts.columns.map((i) => formatFormColumn(i)))
-
+  /**
+   * el-form 组件实例
+   */
   const formRef = ref<FormInstance | null>(null)
-  const submitting = ref(false)
-  const formState = computed<FormState<T>>(() => {
-    // @ts-ignore
-    const list = columns.value.filter((i) => !i._hidden) as OriginFormColumn[]
-
-    return {
-      submitting: submitting.value,
-      model: model.value,
-      columns: list,
-      ref(instance: any) {
-        formRef.value = instance?.elForm
-      },
-    }
+  const originColumn = shallowReactive(opts.columns.map((i) => formatFormColumn(i)))
+  const formState: FormState<T> = reactive({
+    submitting: false,
+    // FIXME: Type instantiation is excessively deep and possibly infinite
+    model: { ...(opts.initData ?? null) } as any,
+    columns: originColumn.filter((i) => !i.hidden) as any[],
+    ref(instance: any) {
+      formRef.value = instance?.elForm
+    },
   })
 
+  /**
+   * 通过prop获取列
+   */
   const getColumn = (prop: UseFormColumn['prop']) => {
-    for (const i of columns.value) {
+    for (const i of originColumn) {
       if (i.prop === prop) {
         return i
       }
@@ -106,73 +84,105 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     return null
   }
 
-  const setColumn = (prop: UseFormColumn['prop'], obj: Partial<UseFormColumn> | null, newVal?: any) => {
-    const originColumn = opts.columns.find((i) => i.prop === prop)
-    const column = getColumn(prop)
+  /**
+   * 通过prop设置列的属性
+   * newVal 可以设置当前prop的表单值
+   */
+  const setColumn = (
+    prop: UseFormColumn['prop'],
+    obj: Partial<ExcludeColumn<UseFormColumn, 'hidden'>> | null,
+    newVal?: any
+  ) => {
+    for (const column of formState.columns) {
+      if (column.prop === prop) {
+        for (const originColumn of opts.columns) {
+          if (originColumn.prop === prop) {
+            const copyColumn = cloneDeep(originColumn)
+            const newColumn = formatFormColumn(Object.assign(copyColumn, obj))
 
-    if (originColumn && column && obj) {
-      const copyColumn = cloneDeep(originColumn)
-      const newColumn = formatFormColumn(Object.assign(copyColumn, obj))
-
-      Object.assign(column, newColumn)
+            Object.assign(column, newColumn)
+            break
+          }
+        }
+        break
+      }
     }
 
     if (!isUndefined(newVal)) {
-      formState.value.model[prop as keyof FormState<T>['model']] = newVal
+      formState.model[prop as keyof FormState<T>['model']] = newVal
     }
   }
 
+  /**
+   * 表单项的显示隐藏
+   */
   const toggleColumn = (
     prop: UseFormColumn['prop'] | UseFormColumn['prop'][] | Record<UseFormColumn['prop'], boolean>,
-    state?: boolean
+    show?: boolean
   ) => {
-    if (isObject(prop) && !Array.isArray(prop)) {
-      for (const i of columns.value) {
-        if (i.prop in prop) {
-          i._hidden = prop[i.prop]
-        }
+    if (!prop) return
+
+    type KMap = Record<NonNullable<UseFormColumn['prop']>, boolean | undefined>
+
+    const propMap: KMap =
+      typeof prop === 'string'
+        ? ({ [prop]: show } as KMap)
+        : !Array.isArray(prop)
+        ? prop
+        : prop.reduce((map, i) => {
+            !!i && (map[i] = show)
+            return map
+          }, {} as KMap)
+    const newColumns: FormState<T>['columns'] = []
+
+    for (const column of originColumn) {
+      const iProp = column.prop as NonNullable<UseFormColumn['prop']>
+
+      if (iProp && iProp in propMap) {
+        column.hidden = isUndefined(propMap[iProp]) ? !column.hidden : !propMap[iProp]
       }
-      return
+
+      !column.hidden && newColumns.push(column)
     }
 
-    const props = Array.isArray(prop) ? prop : [prop]
-
-    for (const i of columns.value) {
-      if (props.includes(i.prop)) {
-        i._hidden = !state ?? !i._hidden
-      }
-    }
+    formState.columns = newColumns
   }
 
+  /**
+   * 表单提交
+   */
   const submit = async (post?: (model: T) => any) => {
     try {
-      submitting.value = true
+      formState.submitting = true
 
       const valid = (await formRef.value?.validate()) ?? true
 
-      if (valid && post) await post(toRaw(unref(model)))
+      if (valid && post) await post(toRaw(unref(formState.model)))
 
-      submitting.value = false
+      formState.submitting = false
     } catch (error) {
-      submitting.value = false
+      formState.submitting = false
 
       throw error
     }
   }
 
+  /**
+   * 设置表单状态
+   * isReset为true时会重置表单项
+   */
   const setModel = (obj: Partial<T>, isReset = false) => {
     if (isReset) {
-      model.value = obj
-      // @ts-ignore
-      columns.value = opts.columns.map((i) => formatFormColumn(i))
-      formRef.value?.clearValidate()
+      formState.model = obj as T
+      formState.columns = originColumn.filter((i) => !i.hidden)
+      formRef.value?.resetFields()
       return
     }
-    model.value = { ...model.value, ...obj }
+    formState.model = { ...formState.model, ...obj }
   }
 
   const getModel = (key: keyof T) => {
-    return model.value[key]
+    return formState.model[key]
   }
 
   return {

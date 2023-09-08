@@ -23,9 +23,9 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
 
   const formDialogState = computed(() => {
     return {
-      formState: formState.value,
+      formState,
       visible: visible.value,
-      submitting: formState.value.submitting,
+      submitting: formState.submitting,
       'onUpdate:modelValue'(val: boolean) {
         visible.value = val
       },
