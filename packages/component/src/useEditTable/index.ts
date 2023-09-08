@@ -34,6 +34,8 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     },
     ...opts,
     async query(p) {
+      if (!opts.query) return { list: [] }
+
       const res = await opts.query(p)
 
       res.list = res.list.map((i) => {
@@ -76,8 +78,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   }
 
   const addRow = (row?: Partial<T>) => {
-    // @ts-ignore
-    const newRow: T = { _editing: true, ...(row ?? null), _origin: void 0 }
+    const newRow = { _editing: true, ...(row ?? null), _origin: void 0 } as T
 
     setState({ data: tableState.data.concat(newRow) })
 

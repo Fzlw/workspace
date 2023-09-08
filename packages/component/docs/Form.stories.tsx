@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { OneForm as Form, useForm, CustomScope } from '../src'
 import { ref, reactive, toRaw, onMounted, nextTick } from 'vue'
 import React from 'react'
-import { FormInstance, ElButton } from 'element-plus'
+import { ElButton } from 'element-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -75,9 +75,9 @@ export const 基础用例: Story = {
     return {
       components: { Form },
       setup() {
-        const formRef = ref<FormInstance>()
+        const formRef = ref<any>()
         const click = () => {
-          formRef.value?.validate((v) => {
+          formRef.value?.elForm.validate((v) => {
             console.log('valid', v)
           })
         }
@@ -118,9 +118,15 @@ export const 配合useForm使用: Story = {
             { label: '文本输入框', prop: 'name', requiredMsg: 'name 必填' },
             { label: '数字输入框', prop: 'age', rType: 'number', min: 1 },
             {
+              label: '单独选框',
+              prop: 'opera-single',
+              rType: 'checkbox',
+              border: true,
+            },
+            {
               label: '多选框',
               prop: 'opera',
-              rType: 'checkbox',
+              rType: 'checkboxGroup',
               options: [
                 { label: '多选1', value: 1 },
                 { label: '多选2', value: 2 },
@@ -134,11 +140,11 @@ export const 配合useForm使用: Story = {
               prop: 'radio',
               rType: 'radio',
               options: [
-                { label: '多选1', value: 1 },
-                { label: '多选2', value: 2 },
-                { label: '多选3', value: 3 },
-                { label: '多选4', value: 4 },
-                { label: '多选5', value: 5 },
+                { label: '单选1', value: 1 },
+                { label: '单选2', value: 2 },
+                { label: '单选3', value: 3 },
+                { label: '单选4', value: 4 },
+                { label: '单选5', value: 5 },
               ],
             },
             { rType: 'date', prop: 'date', label: '日期选择' },
@@ -525,7 +531,7 @@ export const 初始化数据: Story = {
         })
 
         const reset = () => {
-          setModel(toRaw(otherModel), true)
+          setModel({ age: 11 }, true)
         }
 
         return { formState, reset }

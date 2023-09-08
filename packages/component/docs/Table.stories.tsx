@@ -314,3 +314,51 @@ export const 获取ElTable组件实例: Story = {
     }
   },
 }
+
+export const 可隐藏Table列: Story = {
+  render: () => {
+    return {
+      components: { Table },
+      setup() {
+        type Data = { date: string; name: string; address: string }
+
+        const { tableState, handleQuery, toggleColumn } = useTable<Data>({
+          columns: [
+            { label: 'Date', prop: 'date', rFormat: Format.dateTime },
+            { label: 'Name', prop: 'name' },
+            {
+              label: 'Address',
+              prop: 'address',
+              formatter(_row, _column, _cellValue, _index) {
+                return <div>addrrrrr</div>
+              },
+            },
+          ],
+          query() {
+            return new Promise((r) => {
+              setTimeout(() => {
+                const list = new Array(20).fill({
+                  date: new Date().toString(),
+                  name: 'name',
+                  address: Math.random().toString(),
+                })
+
+                r({ list, total: 100 })
+              }, 1000)
+            })
+          },
+        })
+
+        onMounted(handleQuery)
+
+        return { tableState, toggleColumn }
+      },
+      template: `
+        <Table v-bind="tableState" height=300 />
+        <button @click="() => toggleColumn('name', false)">隐藏Name列</button>
+        <button @click="() => toggleColumn('name', true)">显示Name列</button>
+        <button @click="() => toggleColumn('name')">显示/隐藏Name列</button>
+      `,
+    }
+  },
+}

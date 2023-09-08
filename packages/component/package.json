@@ -1,6 +1,6 @@
 {
   "name": "@fzlw/eui-plus",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "",
   "module": "es/index.js",
   "scripts": {
@@ -24,6 +24,10 @@
   "author": "",
   "license": "MIT",
   "homepage": "https://fzlw.github.io/workspace/",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:Fzlw/workspace.git"
+  },
   "dependencies": {
     "el-table-infinite-scroll": "^3.0.1",
     "element-plus": "^2.2.6",

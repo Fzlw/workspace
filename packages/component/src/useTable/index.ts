@@ -1,21 +1,26 @@
 import { Pagination, BaseResult } from '../types'
 import { OneTableProps, TableColumn, LoadMode } from '../Table/index'
-import { reactive, unref, watch, ref } from 'vue'
+import { reactive, unref, watch, ref, shallowReactive } from 'vue'
 import { dayjs, TableInstance } from 'element-plus'
+import { isUndefined } from 'lodash-es'
 
 export enum Format {
   dateTime,
   date,
 }
 
-export type UseTableColumn<T> = TableColumn<T> & { defaultValue?: string; rFormat?: Format }
+export type UseTableColumn<T> = TableColumn<T> & { defaultValue?: string; rFormat?: Format; hidden?: boolean }
 
-export type TableState<T = unknown> = Pick<OneTableProps<T>, 'data' | 'columns'> &
-  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & { mode: LoadMode; pending: boolean }
+export type TableState<T = unknown> = Pick<OneTableProps<T>, 'data'> &
+  Partial<Pick<OneTableProps<T>, 'loading' | 'selected'>> & {
+    mode: LoadMode
+    pending: boolean
+    columns: UseTableColumn<T>[]
+  }
 
 export interface UseTableOptions<T, K> {
   columns: K[]
-  query: (p: Pagination) => BaseResult<T> | Promise<BaseResult<T>>
+  query?: (p: Pagination) => BaseResult<T> | Promise<BaseResult<T>>
   pagination?: Partial<Pagination>
   mode?: LoadMode
   mapColumn?: (i: K) => K
@@ -31,8 +36,11 @@ export const defaultFormatter = (cellValue: any, format?: Format, defaultValue?:
 }
 
 export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opts: UseTableOptions<T, K>) => {
+  /**
+   * el-table 组件实例
+   */
   const tableRef = ref<TableInstance | null>(null)
-  const pagination: Pagination = reactive({
+  const pagination: Pagination = shallowReactive({
     currentPage: 1,
     pageSize: 20,
     total: 0,
@@ -46,25 +54,27 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     },
     ...opts.pagination,
   })
+  const originColumn = shallowReactive<TableState<T>['columns']>(
+    opts.columns.map((i) => {
+      const { defaultValue = '-', rFormat, formatter, ...other } = i
+
+      return {
+        ...other,
+        formatter: (row, column, cellValue, index) => {
+          if (formatter) return formatter(row, column, cellValue, index)
+
+          return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
+        },
+        ...(opts.mapColumn && opts.mapColumn(i)),
+      }
+    })
+  )
   const tableState: TableState<T> = reactive({
     loading: false,
     pending: false,
     data: [],
     selected: [],
-    columns: opts.columns.map((i) => {
-      const { defaultValue = '-', rFormat, formatter, ...other } = i
-
-      return (
-        opts.mapColumn?.(i) ?? {
-          ...other,
-          formatter: (row, column, cellValue, index) => {
-            if (formatter) return formatter(row, column, cellValue, index)
-
-            return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
-          },
-        }
-      )
-    }),
+    columns: originColumn.filter((i) => !i.hidden),
     mode: opts.mode ?? LoadMode.single,
     // 同 Table 组件事件
     onNext() {
@@ -80,6 +90,9 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     },
   })
 
+  /**
+   * 查询
+   */
   const handleQuery = async (disabledLoading = false) => {
     if (!opts.query || tableState.pending) return
 
@@ -101,6 +114,9 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     tableState.loading = false
   }
 
+  /**
+   * 下一页
+   */
   const handleNext = () => {
     const { currentPage, pageSize, total = 0 } = pagination
 
@@ -117,6 +133,35 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     }
   }
 
+  const toggleColumn = (prop: K['prop'] | K['prop'][] | Record<NonNullable<K['prop']>, boolean>, show?: boolean) => {
+    if (!prop) return
+
+    type KMap = Record<NonNullable<K['prop']>, boolean | undefined>
+
+    const propMap: KMap =
+      typeof prop === 'string'
+        ? ({ [prop]: show } as KMap)
+        : !Array.isArray(prop)
+        ? prop
+        : prop.reduce((map, i) => {
+            !!i && (map[i] = show)
+            return map
+          }, {} as KMap)
+    const newColumns: TableState<T>['columns'] = []
+
+    for (const column of originColumn) {
+      const iProp = column.prop as NonNullable<K['prop']>
+
+      if (iProp && iProp in propMap) {
+        column.hidden = isUndefined(propMap[iProp]) ? !column.hidden : !propMap[iProp]
+      }
+
+      !column.hidden && newColumns.push(column)
+    }
+
+    tableState.columns = newColumns
+  }
+
   watch(
     () => [pagination.currentPage],
     () => handleQuery()
@@ -129,5 +174,6 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     handleQuery,
     handleNext,
     setState,
+    toggleColumn,
   }
 }
