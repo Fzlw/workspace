@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, onMounted } from 'vue'
+import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import { ElSelect, vLoading, ElInfiniteScroll, ElOption } from 'element-plus'
 import 'element-plus/es/components/loading/style/css'
 import { isUndefined } from 'lodash-es'
@@ -50,7 +50,7 @@ const options = ref<ElOptionProps[]>([])
 const loading = ref(false)
 const inited = ref(false) // 数据初始化
 const initedScroll = ref(false) // 无限列表初始
-const remoteRef = ref()
+const remoteRef = shallowRef()
 const pagination = reactive<Pagination>({ currentPage: 1, pageSize: 20, total: 0 })
 const keyword = ref()
 let optionsMap = new Map<ElOptionProps['value'], any>()
@@ -107,10 +107,12 @@ const query = async () => {
     options.value = pagination.currentPage === 1 ? list : options.value.concat(list)
     pagination.total = res.total ?? options.value.length
     inited.value = true
+    loading.value = false
   } catch (error) {
-    console.error('remoteMethod Error', error)
+    loading.value = false
+
+    throw error
   }
-  loading.value = false
 }
 
 const next = () => {

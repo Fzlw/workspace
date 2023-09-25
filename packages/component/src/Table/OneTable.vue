@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, computed, withDirectives, h, PropType, DirectiveArguments, ref } from 'vue'
+import { defineComponent, computed, withDirectives, h, PropType, DirectiveArguments, shallowRef } from 'vue'
 import vElTableInfiniteScroll from 'el-table-infinite-scroll'
 import { ElTable, ElTableColumn, vLoading, TableInstance } from 'element-plus'
 import { TableColumn, LoadMode, OneTableProps } from './types'
@@ -13,7 +13,7 @@ export default defineComponent({
   },
   emits: ['update:selected', 'next'],
   setup(props, { emit }) {
-    const elTable = ref<TableInstance | null>(null)
+    const elTable = shallowRef<TableInstance | null>(null)
     const disabled = computed(() => props.mode !== LoadMode.infinite)
 
     const onSelectionChange = (e: OneTableProps['data']) => emit('update:selected', e)

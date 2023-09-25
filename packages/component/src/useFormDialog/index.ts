@@ -1,9 +1,9 @@
 import { computed, ref, watch } from 'vue'
-import { useForm, UseFormOptions, SubmitPost } from '../useForm'
-import { ElDialogProps } from '../FormDialog'
+import { useForm, UseFormOptions, SubmitPost, IFormColumn as FormColumn } from '../useForm'
+import { FormDialogProps } from '../FormDialog'
 
 export type UseFormDialogOptions<T> = UseFormOptions<T> & {
-  post: SubmitPost<T>
+  post?: SubmitPost<T>
   onClose?: VoidFunction
   onOpen?: VoidFunction
 }
@@ -14,27 +14,31 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
   const dialogProps = ref({})
 
   const submit = (post?: SubmitPost<T>) => {
-    other.submit(async (model) => {
+    return other.submit(async (model) => {
       post && (await post(model))
 
       hide()
     })
   }
 
+  const onUpdateModelValue = (val: boolean) => {
+    visible.value = val
+    !val && (dialogProps.value = {})
+  }
+  const onSubmit = () => submit(opts.post)
+
   const formDialogState = computed(() => {
     return {
       formState,
       visible: visible.value,
       submitting: formState.submitting,
-      'onUpdate:modelValue'(val: boolean) {
-        visible.value = val
-      },
-      onSubmit: () => submit(opts.post),
+      'onUpdate:modelValue': onUpdateModelValue,
+      onSubmit,
       ...dialogProps.value,
     }
   })
 
-  const show = (props?: Partial<ElDialogProps> & { onSubmit?: VoidFunction }) => {
+  const show = (props?: Partial<FormDialogProps> & { onSubmit?: () => Promise<void> }) => {
     props && (dialogProps.value = props)
     visible.value = true
   }
@@ -47,6 +51,9 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     val ? opts.onOpen?.() : opts.onClose?.()
   })
 
+  const forEachColumns = (cb: (i: FormColumn, index: number, arr: FormColumn[]) => void) =>
+    formState.columns.forEach(cb)
+
   return {
     ...other,
     formDialogState,
@@ -54,5 +61,6 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     hide,
     submit,
     getModel,
+    forEachColumns,
   }
 }

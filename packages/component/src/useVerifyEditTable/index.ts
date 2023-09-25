@@ -1,7 +1,7 @@
 import { isUndefined } from 'lodash-es'
-import { h, reactive, ref, unref } from 'vue'
+import { UnwrapRef, computed, h, ref, shallowRef, unref } from 'vue'
 import { ElFormItem, FormInstance, FormValidateFailure } from 'element-plus'
-import { ExpandColumn, ExcludeColumn, useColumn } from '../useColumn'
+import { ExpandColumn, ExcludeColumn, renderColumn } from '../useColumn'
 import { UseFormColumn, formatFormColumn } from '../useForm'
 import { UseTableOptions, defaultFormatter, TableState } from '../useTable'
 import { UseEditTableColumn, EditTableRow, useEditTable } from '../useEditTable'
@@ -17,7 +17,6 @@ export interface VerifyTableState<T> {
 }
 
 export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTableOptions<T>) {
-  const renderColumn = useColumn()
   const { tableState, editRow, delRow, cancelRow, saveRow, addRow, ...other } = useEditTable<T>({
     mapColumn(i) {
       const { formItemProps, editable, formatter, ...other } = formatFormColumn(i) as UseVerifyEditTableColumn<T>
@@ -46,31 +45,34 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
     ...opts,
   })
 
-  const verifyForm = ref<FormInstance | null>(null)
-  const verifyTableState: VerifyTableState<T> = reactive({
-    tableState,
-    model: null,
-    ref(instance: any) {
-      verifyForm.value = instance?.elForm
-    },
+  const verifyForm = shallowRef<FormInstance | null>(null)
+  const model = ref<VerifyTableState<T>['model']>(null)
+  const verifyTableState = computed<VerifyTableState<T>>(() => {
+    return {
+      tableState: unref(tableState),
+      model: unref(model) as T,
+      ref(instance: any) {
+        verifyForm.value = instance?.elForm
+      },
+    }
   })
 
   const vEditRow: typeof editRow = (row) => {
-    if (verifyTableState.model) return
+    if (unref(model)) return
 
-    verifyTableState.model = row
+    model.value = row as UnwrapRef<T>
 
     editRow(row)
   }
 
   const vDelRow: typeof delRow = (row) => {
-    verifyTableState.model = null
+    model.value = null
 
     delRow(row)
   }
 
   const vCancelRow: typeof cancelRow = (row) => {
-    verifyTableState.model = null
+    model.value = null
 
     cancelRow(row)
   }
@@ -80,7 +82,7 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
       const valid = await verifyForm.value?.validate?.()
 
       if (valid) {
-        verifyTableState.model = null
+        model.value = null
 
         saveRow(row)
       }
@@ -92,17 +94,17 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
   }
 
   const vAddRow = (row?: T) => {
-    if (verifyTableState.model) return
+    if (unref(model)) return
 
     const newRow = addRow(row)
 
-    verifyTableState.model = newRow
+    model.value = newRow as UnwrapRef<T>
 
     return newRow
   }
 
   const hasEditingRow = () => {
-    return !!unref(verifyTableState.model)
+    return !!unref(model)
   }
 
   return {
