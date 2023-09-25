@@ -1,9 +1,9 @@
 <script lang="tsx">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, shallowRef } from 'vue'
 import type { PropType } from 'vue'
 import { ElForm, ElFormItem } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import { useColumn, NonModel } from '../useColumn'
+import { renderColumn, NonModel } from '../useColumn'
 import type { FormColumn } from './types'
 
 export default defineComponent({
@@ -12,17 +12,14 @@ export default defineComponent({
     columns: { type: Array as PropType<FormColumn[]>, required: true },
   },
   setup(_props) {
-    const elForm = ref<FormInstance>()
-
-    const renderColumn = useColumn()
+    const elForm = shallowRef<FormInstance>()
 
     return {
       elForm,
-      renderColumn,
     }
   },
   render() {
-    const { $slots, $attrs, model, columns, renderColumn } = this
+    const { $slots, $attrs, model, columns } = this
 
     return (
       <ElForm {...$attrs} model={model} ref='elForm'>

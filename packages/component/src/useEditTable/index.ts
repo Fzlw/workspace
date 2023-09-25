@@ -1,7 +1,7 @@
 import { useTable, UseTableColumn, defaultFormatter, UseTableOptions, TableState } from '../useTable'
-import { Column, useColumn, ExpandColumn } from '../useColumn'
+import { Column, renderColumn, ExpandColumn } from '../useColumn'
 import { cloneDeep, isUndefined, isEqual } from 'lodash-es'
-import { readonly, computed, reactive, unref } from 'vue'
+import { readonly, computed, unref } from 'vue'
 
 export type UseEditTableColumn<T> = ExpandColumn<Column, UseTableColumn<T> & { editable?: boolean }>
 export interface EditTableRow {
@@ -14,7 +14,6 @@ export interface EditTableRow {
 export type UseEditTableOptions<T> = UseTableOptions<T, UseEditTableColumn<T>>
 
 export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, UseEditTableColumn<T>>) => {
-  const renderColumn = useColumn()
   const { tableState, setState, ...other } = useTable<T, UseEditTableColumn<T>>({
     mapColumn(i) {
       const { formatter, editable, ...other } = i
@@ -85,6 +84,35 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     return newRow
   }
 
+  /**
+   * @param row 移动当前项
+   * @param position 移动位置
+   * @param relative true：相对当前位置向前或向后移动 false: 移动到绝对索引位置   默认为true
+   */
+  const moveRow = (row: T, position: number, relative = true) => {
+    const target = unref(tableState).data
+    const last = target.length - 1
+
+    // 绝对模式下 检查索引值
+    if (!relative) {
+      if (position < 0 || position > last) {
+        return
+      }
+    }
+
+    for (let i = 0; i <= last; i++) {
+      if (target[i] === row) {
+        const index = relative ? i + position : position
+        const limitIndex = Math.max(Math.min(index, last), 0)
+        const newTarget = target.slice(0, i).concat(target.slice(i + 1))
+
+        newTarget.splice(limitIndex, 0, target[i])
+        setState({ data: newTarget })
+        break
+      }
+    }
+  }
+
   const rowIsEditing = (row: T) => {
     return !!row._editing
   }
@@ -123,10 +151,13 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     return [removed, added, changed] as const
   }
 
-  const data = computed(() => tableState.data.filter((i) => !i._delete))
-  const editTableState: TableState<T> = reactive({
-    ...tableState,
-    data,
+  const editTableState = computed<TableState<T>>(() => {
+    const ts = unref(tableState)
+
+    return {
+      ...ts,
+      data: ts.data.filter((i) => !i._delete),
+    }
   })
 
   return {
@@ -142,5 +173,6 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     getChangedRows,
     rowIsAdded,
     setState,
+    moveRow,
   }
 }

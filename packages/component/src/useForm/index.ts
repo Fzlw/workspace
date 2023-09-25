@@ -1,4 +1,4 @@
-import { ref, unref, toRaw, reactive, shallowReactive } from 'vue'
+import { shallowRef, unref, toRaw, reactive } from 'vue'
 import { isUndefined, cloneDeep } from 'lodash-es'
 import { FormItemProps, FormInstance } from 'element-plus'
 import { FormColumn as OriginFormColumn } from '../Form'
@@ -20,12 +20,12 @@ export interface FormState<T> {
   ref?: any
 }
 
-type FormColumn = ExpandColumn<OriginFormColumn, { hidden?: boolean }>
+export type IFormColumn = ExpandColumn<OriginFormColumn, { hidden?: boolean }>
 
 export const formatFormColumn = (column: UseFormColumn) => {
   const { prop, formItemProps, label, labelWidth, rules, requiredMsg, ...other } = column
 
-  const newColumn: FormColumn = {
+  const newColumn: IFormColumn = {
     ...other,
     prop,
     formItemProps: {
@@ -41,7 +41,7 @@ export const formatFormColumn = (column: UseFormColumn) => {
               message: requiredMsg,
             },
           ]
-        : [],
+        : void 0,
       ...formItemProps,
     },
   }
@@ -60,13 +60,13 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
   /**
    * el-form 组件实例
    */
-  const formRef = ref<FormInstance | null>(null)
-  const originColumn = shallowReactive(opts.columns.map((i) => formatFormColumn(i)))
+  const formRef = shallowRef<FormInstance | null>(null)
+  const originColumn = shallowRef(opts.columns.map((i) => formatFormColumn(i)))
   const formState: FormState<T> = reactive({
     submitting: false,
     // FIXME: Type instantiation is excessively deep and possibly infinite
     model: { ...(opts.initData ?? null) } as any,
-    columns: originColumn.filter((i) => !i.hidden) as any[],
+    columns: unref(originColumn).filter((i) => !i.hidden) as any[],
     ref(instance: any) {
       formRef.value = instance?.elForm
     },
@@ -76,7 +76,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    * 通过prop获取列
    */
   const getColumn = (prop: UseFormColumn['prop']) => {
-    for (const i of originColumn) {
+    for (const i of unref(originColumn)) {
       if (i.prop === prop) {
         return i
       }
@@ -114,6 +114,21 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
   }
 
   /**
+   * 用于快速更新表单项状态 避免 setColumn 性能问题
+   */
+  const patchColumn = (column: IFormColumn, patch?: Partial<ExcludeColumn<UseFormColumn, 'prop'>>) => {
+    if (patch) {
+      const newColumn = formatFormColumn({
+        ...patch,
+        prop: column.prop,
+        formItemProps: column.formItemProps,
+      } as UseFormColumn)
+
+      Object.assign(column, newColumn)
+    }
+  }
+
+  /**
    * 表单项的显示隐藏
    */
   const toggleColumn = (
@@ -135,7 +150,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
           }, {} as KMap)
     const newColumns: FormState<T>['columns'] = []
 
-    for (const column of originColumn) {
+    for (const column of unref(originColumn)) {
       const iProp = column.prop as NonNullable<UseFormColumn['prop']>
 
       if (iProp && iProp in propMap) {
@@ -157,7 +172,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
 
       const valid = (await formRef.value?.validate()) ?? true
 
-      if (valid && post) await post(toRaw(unref(formState.model)))
+      if (valid && post) await post(cloneDeep(toRaw(formState.model)))
 
       formState.submitting = false
     } catch (error) {
@@ -173,8 +188,8 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    */
   const setModel = (obj: Partial<T>, isReset = false) => {
     if (isReset) {
-      formState.model = obj as T
-      formState.columns = originColumn.filter((i) => !i.hidden)
+      formState.model = cloneDeep(toRaw(obj)) as T
+      formState.columns = unref(originColumn).filter((i) => !i.hidden)
       formRef.value?.resetFields()
       return
     }
@@ -194,5 +209,6 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     setModel,
     form: formRef,
     getModel,
+    patchColumn,
   }
 }

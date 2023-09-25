@@ -1,6 +1,6 @@
 import { Pagination, BaseResult } from '../types'
 import { OneTableProps, TableColumn, LoadMode } from '../Table/index'
-import { reactive, unref, watch, ref, shallowReactive } from 'vue'
+import { reactive, unref, watch, shallowRef, shallowReactive } from 'vue'
 import { dayjs, TableInstance } from 'element-plus'
 import { isUndefined } from 'lodash-es'
 
@@ -39,7 +39,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   /**
    * el-table 组件实例
    */
-  const tableRef = ref<TableInstance | null>(null)
+  const tableRef = shallowRef<TableInstance | null>(null)
   const pagination: Pagination = shallowReactive({
     currentPage: 1,
     pageSize: 20,
@@ -54,7 +54,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     },
     ...opts.pagination,
   })
-  const originColumn = shallowReactive<TableState<T>['columns']>(
+  const originColumn = shallowRef<TableState<T>['columns']>(
     opts.columns.map((i) => {
       const { defaultValue = '-', rFormat, formatter, ...other } = i
 
@@ -65,6 +65,9 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
 
           return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
         },
+        ...(i.type === 'index' && {
+          index: i.index ?? ((j) => (pagination.currentPage - 1) * pagination.pageSize + j + 1),
+        }),
         ...(opts.mapColumn && opts.mapColumn(i)),
       }
     })
@@ -74,7 +77,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     pending: false,
     data: [],
     selected: [],
-    columns: originColumn.filter((i) => !i.hidden),
+    columns: unref(originColumn).filter((i) => !i.hidden),
     mode: opts.mode ?? LoadMode.single,
     // 同 Table 组件事件
     onNext() {
@@ -106,12 +109,14 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
 
       tableState.data = page === 1 || tableState.mode === LoadMode.single ? list : tableState.data.concat(list)
       pagination.total = total || list.length
+      tableState.pending = false
+      tableState.loading = false
     } catch (error) {
-      console.error(error)
-    }
+      tableState.pending = false
+      tableState.loading = false
 
-    tableState.pending = false
-    tableState.loading = false
+      throw error
+    }
   }
 
   /**
@@ -149,7 +154,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
           }, {} as KMap)
     const newColumns: TableState<T>['columns'] = []
 
-    for (const column of originColumn) {
+    for (const column of unref(originColumn)) {
       const iProp = column.prop as NonNullable<K['prop']>
 
       if (iProp && iProp in propMap) {

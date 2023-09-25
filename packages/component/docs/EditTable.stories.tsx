@@ -30,66 +30,76 @@ export const 可编辑表格: Story = {
       setup() {
         type Row = { date: string; name: string; address: string }
 
-        const { tableState, handleQuery, editRow, cancelRow, delRow, saveRow, rowIsEditing, addRow, getChangedRows } =
-          useEditTable<Row>({
-            columns: [
-              { label: 'Date', prop: 'date', rFormat: 0, rType: 'date' },
-              { label: 'Name', prop: 'name' },
-              {
-                label: 'Address',
-                prop: 'address',
-                formatter(_row, _column, _cellValue, _index) {
-                  return 'addrrrrr001'
-                },
-                elProps: {
-                  formatter(value) {
-                    return value + '-'
-                  },
-                },
-              },
-              {
-                label: 'state',
-                prop: 'state',
-                editable: false,
-                formatter(row) {
-                  return rowIsEditing(row) ? '编辑中' : '-'
+        const {
+          tableState,
+          handleQuery,
+          editRow,
+          cancelRow,
+          delRow,
+          saveRow,
+          rowIsEditing,
+          addRow,
+          getChangedRows,
+          moveRow,
+        } = useEditTable<Row>({
+          columns: [
+            { label: 'Date', prop: 'date', rFormat: 0, rType: 'date' },
+            { label: 'Name', prop: 'name' },
+            {
+              label: 'Address',
+              prop: 'address',
+              elProps: {
+                formatter(value) {
+                  return value + '-'
                 },
               },
-              {
-                label: 'opera',
-                prop: '',
-                editable: false,
-                formatter(row) {
-                  return (
-                    <div>
-                      <button onClick={() => editRow(row)}>edit</button>
-                      <button onClick={() => delRow(row)}>delete</button>
-                      <button onClick={() => cancelRow(row)}>cancel</button>
-                      <button onClick={() => saveRow(row)}>save</button>
-                    </div>
-                  )
-                },
-              },
-            ],
-            query() {
-              return new Promise((r) => {
-                setTimeout(() => {
-                  const list = [
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                    { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  ]
-
-                  r({ list, total: 100 })
-                }, 1000)
-              })
             },
-          })
+            {
+              label: 'state',
+              prop: 'state',
+              editable: false,
+              formatter(row) {
+                return rowIsEditing(row) ? '编辑中' : '-'
+              },
+            },
+            {
+              label: 'opera',
+              prop: '',
+              editable: false,
+              formatter(row) {
+                return (
+                  <div>
+                    <button onClick={() => editRow(row)}>edit</button>
+                    <button onClick={() => delRow(row)}>delete</button>
+                    <button onClick={() => cancelRow(row)}>cancel</button>
+                    <button onClick={() => saveRow(row)}>save</button>
+                    <button onClick={() => moveRow(row, -1)}>move prev</button>
+                    <button onClick={() => moveRow(row, 1)}>move next</button>
+                    <button onClick={() => moveRow(row, 1, false)}>move to 2</button>
+                  </div>
+                )
+              },
+            },
+          ],
+          query() {
+            return new Promise((r) => {
+              setTimeout(() => {
+                const list = [
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                ]
+
+                r({ list, total: 100 })
+              }, 1000)
+            })
+          },
+        })
 
         onMounted(handleQuery)
 

@@ -2,11 +2,10 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { onMounted } from 'vue'
 import { ElPagination, ElMessage, ElButton } from 'element-plus'
 
-import { Format, useLayout, OneTable, LayoutCommand, OneFormDialog, OneForm } from '../src'
+import { Format, useLayout, OneTable, Commands, OneFormDialog, OneForm } from '../src'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
- * 目前为TODO状态 未来阶段可能会修改或移除
  * 提供基本的布局响应式状态
  * 包括查询、新增、修改、删除、导出
  * 不提供具体的页面布局组件
@@ -76,12 +75,8 @@ export const 基础用例: Story = {
       components: { OneTable, ElPagination, OneFormDialog, ElButton, OneForm },
       setup() {
         type Row = { date: string; name: string; age: number }
-        type Query = { name: string; age: number }
 
-        const { tableState, queryState, formDialogState, pagination, query, command, resetQuery } = useLayout<
-          Row,
-          Query
-        >({
+        const { tableState, queryState, formDialogState, pagination, query, command, resetQuery } = useLayout<Row>({
           columns: [
             { label: 'name', prop: 'name' },
             { label: 'age', prop: 'age' },
@@ -92,7 +87,7 @@ export const 基础用例: Story = {
             { label: 'age', prop: 'age', rType: 'number' },
           ],
           formColumns: [
-            { label: 'name', prop: 'name', requiredMsg: '必填啊' },
+            { label: 'name', prop: 'name', requiredMsg: '必填啊', disabledType: [Commands.put] },
             { label: 'age', prop: 'age', rType: 'number', min: 0 },
             { label: 'date', prop: 'date', rType: 'date' },
           ],
@@ -101,7 +96,7 @@ export const 基础用例: Story = {
               setTimeout(() => {
                 const list = new Array(10).fill(0).map(() => ({
                   date: new Date().toString(),
-                  name: `name-${pa.currentPage}-${query.name}`,
+                  name: `name-${pa.currentPage}-${query.name ?? ''}`,
                   age: Math.random(),
                 }))
 
@@ -142,9 +137,15 @@ export const 基础用例: Story = {
             })
           },
           commands: [
-            { label: '编辑', command: LayoutCommand.put },
-            { label: '导出', command: LayoutCommand.export },
-            { label: '删除', command: LayoutCommand.delete, link: true, type: 'danger' },
+            { label: '编辑', command: Commands.put, options: { title: '来编辑' } },
+            { label: '导出', command: Commands.export },
+            {
+              label: '删除',
+              command: Commands.delete,
+              link: true,
+              type: 'danger',
+              options: { title: '98765', type: 'error' },
+            },
           ],
           queryState: {
             age: 2,
@@ -153,8 +154,8 @@ export const 基础用例: Story = {
 
         onMounted(query)
 
-        const onAdd = () => command(LayoutCommand.post)
-        const onExport = () => command(LayoutCommand.export)
+        const onAdd = () => command(Commands.post)
+        const onExport = () => command(Commands.export)
 
         return { tableState, queryState, formDialogState, pagination, onAdd, onExport, query, resetQuery }
       },
