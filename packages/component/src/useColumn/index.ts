@@ -11,6 +11,7 @@ import {
   ElCheckboxGroup,
   ElCheckbox,
   ElSwitch,
+  ElColorPicker,
 } from 'element-plus'
 import {
   NumberColumn,
@@ -26,6 +27,7 @@ import {
   SwitchColumn,
   CustomScope,
   CheckboxGroupColumn,
+  ColorColumn,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
 import { isUndefined, isEmpty, get, set } from 'lodash-es'
@@ -138,7 +140,7 @@ const renderRadio: RenderColumn<RadioColumn> = (model, i) => {
 }
 
 const renderCheckbox: RenderColumn<CheckboxColumn> = (model, i) => {
-  if (Array.isArray(i.options) && i.options.length > 0) {
+  if (Array.isArray(i.options)) {
     return renderCheckboxGroup(model, i as unknown as CheckboxGroupColumn)
   }
 
@@ -220,6 +222,16 @@ const renderSwitch: RenderColumn<SwitchColumn> = (model, i) => {
   })
 }
 
+const renderColorPicker: RenderColumn<ColorColumn> = (model, i) => {
+  return h(ElColorPicker, {
+    ...i,
+    modelValue: get(model, i.prop),
+    'onUpdate:modelValue': (value) => {
+      set(model, i.prop, value)
+    },
+  })
+}
+
 const renderMap: Record<NonNullable<Column['rType']>, RenderColumn<any>> = {
   number: renderNumber,
   date: renderDate,
@@ -231,6 +243,7 @@ const renderMap: Record<NonNullable<Column['rType']>, RenderColumn<any>> = {
   text: renderInput,
   remote: renderRemote,
   switch: renderSwitch,
+  color: renderColorPicker,
 }
 
 /**
