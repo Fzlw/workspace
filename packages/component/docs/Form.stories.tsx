@@ -168,6 +168,11 @@ export const 配合useForm使用: Story = {
               activeText: '是',
               inactiveText: '否',
             },
+            {
+              rType: 'color',
+              prop: 'color',
+              label: '颜色选择',
+            },
           ],
         })
 

@@ -9,6 +9,8 @@ import {
   ElCheckboxGroup,
   ElCheckbox,
   SwitchProps,
+  ColorPickerProps,
+  ColorPickerEmits,
 } from 'element-plus'
 import { Pagination, BaseResult } from '../types'
 
@@ -88,6 +90,12 @@ export interface RemoteColumn extends BaseColumn, SelectProps {
   defaultOptions?: ElOptionProps[]
 }
 
+export interface ColorColumn extends BaseColumn, Partial<ColorPickerProps> {
+  rType: 'color'
+  onChange?: ColorPickerEmits['change']
+  onActiveChange?: ColorPickerEmits['activeChange']
+}
+
 export type Column =
   | InputColumn
   | NumberColumn
@@ -99,6 +107,7 @@ export type Column =
   | RemoteColumn
   | SwitchColumn
   | CheckboxGroupColumn
+  | ColorColumn
 
 export type ExpandColumn<T, K extends object> = T extends BaseColumn ? T & K : never
 
