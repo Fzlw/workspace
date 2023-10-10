@@ -23,7 +23,7 @@ export interface UseLayoutOptions<T, Q, K> {
   post?: UseFormDialogOptions<K>['post']
   put?: UseFormDialogOptions<K>['post']
   delete?: (row: T) => any
-  export?: (query: Q, p: Pagination) => any
+  export?: (row: T | null | undefined, query: Q, p: Pagination) => any
   commands?: CommandOpt<T>
   commandColumn?: UseTableColumn<T>
   columns?: UseTableColumn<T>[]
@@ -62,7 +62,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   function command(cmd: Commands.post, row?: T | null, options?: CommandDialogItem['options']): void
   function command(cmd: Commands.put, row?: T | null, options?: CommandDialogItem['options']): void
   function command(cmd: Commands.delete, row: T, options?: CommandBoxItem['options']): void
-  function command(cmd: Commands.export): void
+  function command(cmd: Commands.export, row?: T | null): void
 
   function command(cmd: Commands, row?: T | null, options?: CommandItem['options']) {
     if (cmd === Commands.post || cmd === Commands.put) {
@@ -124,7 +124,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
           .then(() => {
             mixedState.exporting = true
 
-            return eM?.(unref(queryState.model), unref(pagination))
+            return eM?.(row, unref(queryState.model), unref(pagination))
           })
           .finally(() => (mixedState.exporting = false))
         break
