@@ -8,6 +8,7 @@ export interface EditTableRow {
   _origin?: Omit<EditTableRow, '_editing' | '_delete' | '_origin'>
   _editing?: boolean
   _delete?: boolean
+  _new?: boolean
   [key: string]: any
 }
 
@@ -77,7 +78,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   }
 
   const addRow = (row?: Partial<T>) => {
-    const newRow = { _editing: true, ...(row ?? null), _origin: row ? cloneDeep(row) : void 0 } as T
+    const newRow = { _editing: true, ...(row ?? null), _new: true, _origin: row ? cloneDeep(row) : void 0 } as T
 
     setState({ data: tableState.data.concat(newRow) })
 
@@ -118,7 +119,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   }
 
   const rowIsAdded = (row: T) => {
-    return isUndefined(row._origin)
+    return row._new === true
   }
 
   /**
