@@ -77,7 +77,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   }
 
   const addRow = (row?: Partial<T>) => {
-    const newRow = { _editing: true, ...(row ?? null), _origin: void 0 } as T
+    const newRow = { _editing: true, ...(row ?? null), _origin: row ? cloneDeep(row) : void 0 } as T
 
     setState({ data: tableState.data.concat(newRow) })
 
@@ -160,6 +160,15 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     }
   })
 
+  const setEditTableState: typeof setState = (obj) => {
+    if (Array.isArray(obj.data)) {
+      for (const i of obj.data) {
+        i._origin = i._origin ?? cloneDeep(i)
+      }
+    }
+    setState(obj)
+  }
+
   return {
     ...other,
     tableState: editTableState,
@@ -172,7 +181,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     rowIsEditing,
     getChangedRows,
     rowIsAdded,
-    setState,
+    setState: setEditTableState,
     moveRow,
   }
 }
