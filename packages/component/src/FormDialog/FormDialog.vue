@@ -34,8 +34,8 @@ export interface Props {
   formState: OneFormProps
   noText?: string
   okText?: string
-  noProps?: ButtonProps
-  okProps?: ButtonProps
+  noProps?: Partial<ButtonProps>
+  okProps?: Partial<ButtonProps>
   submitting?: boolean
 }
 

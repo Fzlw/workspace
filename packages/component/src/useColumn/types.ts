@@ -33,6 +33,7 @@ export interface NumberColumn extends BaseColumn, ExtProps<InputNumberInstance['
 export interface DateColumn extends BaseColumn, Partial<DatePickerProps> {
   rType: 'date'
   onChange?: (val: DatePickerProps['modelValue']) => void
+  onCalendarChange?: (val: [Date, null | Date]) => void
 }
 
 export type ValueMap = Record<string, string | string[]>

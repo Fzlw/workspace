@@ -196,7 +196,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     formState.model = { ...formState.model, ...obj }
   }
 
-  const getModel = (key: keyof T) => {
+  const getModel = <K extends keyof T = keyof T>(key: K): T[K] => {
     return formState.model[key]
   }
 

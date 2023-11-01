@@ -32,7 +32,12 @@ export default defineComponent({
         { ...$attrs, 'infinite-scroll-disabled': disabled, onSelectionChange, ref: 'elTable' },
         {
           ...$slots,
-          default: () => columns.map((i) => h(ElTableColumn, { key: i.prop, ...i })),
+          default: () =>
+            columns.map((i) => {
+              const { slots, ...other } = i
+
+              return h(ElTableColumn, { key: i.prop, ...other }, slots)
+            }),
         }
       ),
       directives

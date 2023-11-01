@@ -60,7 +60,7 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     show,
     hide,
     submit,
-    getModel,
+    getModel: getModel as <K extends keyof T = keyof T>(_k: K) => T[K],
     forEachColumns,
   }
 }
