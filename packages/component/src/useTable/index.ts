@@ -66,7 +66,13 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
           return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
         },
         ...(i.type === 'index' && {
-          index: i.index ?? ((j) => (pagination.currentPage - 1) * pagination.pageSize + j + 1),
+          index:
+            i.index ??
+            ((j: number) => {
+              if (opts.mode === LoadMode.infinite) return j + 1
+
+              return (pagination.currentPage - 1) * pagination.pageSize + j + 1
+            }),
         }),
         ...(opts.mapColumn && opts.mapColumn(i)),
       }
