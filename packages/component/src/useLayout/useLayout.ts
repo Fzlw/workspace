@@ -32,6 +32,7 @@ export interface UseLayoutOptions<T, Q, K> {
   queryColumns?: UseFormColumn[]
   formColumns?: UseLayoutColumn[]
   queryState?: Partial<Q>
+  align?: UseTableColumn<T>['align']
 }
 
 /**
@@ -57,6 +58,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
     commands,
     commandColumn,
     queryState: qS,
+    align = 'center', // 默认居中展示
   } = opts
 
   function command(cmd: Commands.post, row?: T | null, options?: CommandDialogItem['options']): void
@@ -146,10 +148,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
     query: get ? (p) => get(unref(queryState.model), p) : void 0,
     pagination: pa,
     mapColumn() {
-      return {
-        // 默认居中展示
-        align: 'center',
-      }
+      return { align }
     },
   })
 
