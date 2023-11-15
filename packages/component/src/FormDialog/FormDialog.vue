@@ -1,23 +1,19 @@
 <template>
-  <ElDialog
-    v-bind="$attrs"
-    :model-value="props.visible"
-    @update:model-value="(value) => emit('update:modelValue', value)"
-  >
+  <ElDialog v-bind="$attrs" :model-value="visible" @update:model-value="(value) => emit('update:modelValue', value)">
     <template #header>
       <slot name="header"></slot>
     </template>
 
-    <OneForm :disabled="submitting" v-bind="props.formState">
+    <OneForm :disabled="submitting" v-bind="formState">
       <template v-for="(_, name) in $slots" v-slot:[name]="data">
         <slot :name="name" v-bind="data" />
       </template>
     </OneForm>
     <template #footer>
       <slot name="footer">
-        <ElButton v-if="props.noText" v-bind="props.noProps" @click="onNo">{{ props.noText }}</ElButton>
-        <ElButton v-if="props.okText" type="primary" :loading="submitting" v-bind="props.okProps" @click="onOK">
-          {{ props.okText }}
+        <ElButton v-if="noText" v-bind="noProps" @click="onNo">{{ noText }}</ElButton>
+        <ElButton v-if="okText" type="primary" :loading="submitting" v-bind="okProps" @click="onOK">
+          {{ okText }}
         </ElButton>
       </slot>
     </template>
@@ -39,7 +35,7 @@ export interface Props {
   submitting?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const _props = withDefaults(defineProps<Props>(), {
   noText: '取消',
   okText: '确定',
 })

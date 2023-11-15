@@ -1,6 +1,6 @@
 <template>
-  <ElForm :model="props.model" ref="elForm">
-    <OneTable v-bind="{ ...$attrs, ...props.tableState }"> </OneTable>
+  <ElForm :model="model" ref="elForm">
+    <OneTable v-bind="{ ...$attrs, ...tableState }"> </OneTable>
   </ElForm>
 </template>
 
@@ -15,7 +15,7 @@ export interface Props<T = unknown> {
   model: FormProps['model']
 }
 
-const props = defineProps<Props>()
+const _props = defineProps<Props>()
 
 const elForm = shallowRef<FormInstance | null>(null)
 

@@ -24,10 +24,10 @@ export default defineComponent({
     return (
       <ElForm {...$attrs} model={model} ref='elForm'>
         {columns.map((i) => {
-          const { formItemProps, ...other } = i
+          const { formItemProps, label, ...other } = i
 
           return (
-            <ElFormItem key={i.prop} {...formItemProps}>
+            <ElFormItem key={i.prop} label={label} {...formItemProps}>
               {renderColumn(model, other, $slots)}
             </ElFormItem>
           )
