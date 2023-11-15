@@ -88,7 +88,7 @@ export const 基础用例: Story = {
           ],
           formColumns: [
             { label: 'name', prop: 'name', requiredMsg: '必填啊', disabledType: [Commands.put] },
-            { label: 'age', prop: 'age', rType: 'number', min: 0 },
+            { label: 'age', prop: 'age', requiredMsg: '必填啊', rType: 'number', min: 0 },
             { label: 'date', prop: 'date', rType: 'date' },
           ],
           get(query, pa) {

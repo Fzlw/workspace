@@ -15,7 +15,8 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
 
   const submit = (post?: SubmitPost<T>) => {
     return other.submit(async (model) => {
-      post && (await post(model))
+      // FIXME: 快速点击情况下 当提交结束关闭弹窗过程中会再次触发
+      visible.value && post && (await post(model))
 
       hide()
     })

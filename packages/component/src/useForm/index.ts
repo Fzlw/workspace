@@ -190,7 +190,8 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     if (isReset) {
       formState.model = cloneDeep(toRaw(obj)) as T
       formState.columns = unref(originColumn).filter((i) => !i.hidden)
-      formRef.value?.clearValidate()
+      // FIXME: resetFields or clearValidate 在useLayout里使用同一个表单实现新增和修改操作 每次打开时要重置表单
+      formRef.value?.resetFields()
       return
     }
     formState.model = { ...formState.model, ...obj }
