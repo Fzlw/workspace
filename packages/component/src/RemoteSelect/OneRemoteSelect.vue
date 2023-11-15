@@ -2,14 +2,14 @@
   <ElSelect
     v-bind="$attrs"
     ref="remoteRef"
-    :model-value="props.modelValue"
+    :model-value="modelValue"
     :filter-method="filterMethod"
     :options="options"
     @update:model-value="onUpdateModelValue"
     @visible-change="onVisible"
   >
     <template #empty>
-      <p v-loading="loading" class="el-select-dropdown__empty">{{ props.noDataText }}</p>
+      <p v-loading="loading" class="el-select-dropdown__empty">{{ noDataText }}</p>
     </template>
     <ElOption v-for="i in options" v-bind="i" :key="i.key"> </ElOption>
   </ElSelect>

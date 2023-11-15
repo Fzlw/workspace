@@ -23,14 +23,14 @@ export interface FormState<T> {
 export type IFormColumn = ExpandColumn<OriginFormColumn, { hidden?: boolean }>
 
 export const formatFormColumn = (column: UseFormColumn) => {
-  const { prop, formItemProps, label, labelWidth, rules, requiredMsg, ...other } = column
+  // FIXME: 移除label 使其在传递中保持响应式
+  const { prop, formItemProps, labelWidth, rules, requiredMsg, ...other } = column
 
   const newColumn: IFormColumn = {
     ...other,
     prop,
     formItemProps: {
       prop,
-      label,
       labelWidth,
       rules: rules
         ? rules
@@ -190,7 +190,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     if (isReset) {
       formState.model = cloneDeep(toRaw(obj)) as T
       formState.columns = unref(originColumn).filter((i) => !i.hidden)
-      formRef.value?.resetFields()
+      formRef.value?.clearValidate()
       return
     }
     formState.model = { ...formState.model, ...obj }

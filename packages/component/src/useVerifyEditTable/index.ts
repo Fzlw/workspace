@@ -23,7 +23,6 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
 
       return {
         ...other,
-        label: i.label,
         formatter(row, column, cellValue, index) {
           if ((isUndefined(editable) || editable === true) && row?._editing) {
             return h(

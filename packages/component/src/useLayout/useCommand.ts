@@ -1,4 +1,4 @@
-import { h, Fragment } from 'vue'
+import { h, Fragment, unref } from 'vue'
 import { ElButton } from 'element-plus'
 import { CommandOpt } from './types'
 import { UseTableColumn } from '../useTable'
@@ -26,7 +26,7 @@ export const useCommand = <T>(
               key: i.command,
               onClick: (e) => (i.onClick ? i.onClick(row, i, e) : cb(i.command, row, i.options)),
             },
-            { default: i.default ?? (() => i.label) }
+            { default: i.default ?? (() => unref(i.label)) }
           )
         })
       )
