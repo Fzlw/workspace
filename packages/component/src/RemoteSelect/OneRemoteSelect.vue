@@ -16,14 +16,13 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, onMounted, shallowRef } from 'vue'
+import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, shallowRef } from 'vue'
 import { ElSelect, vLoading, ElInfiniteScroll, ElOption } from 'element-plus'
 import 'element-plus/es/components/loading/style/css'
-import { isUndefined } from 'lodash-es'
 import { Pagination } from '../types'
 import { SelectProps, RemoteColumn, ElOptionProps } from '../useColumn'
 import { OptionValue } from './types'
-import { formatOption } from '../utils'
+import { formatOption, isUndefinedOrNullChar } from '../utils'
 
 export interface Props {
   modelValue: any
@@ -188,7 +187,7 @@ watch(
   () => [props.modelValue, props.defaultOptions],
   ([value, defaultOptions]) => {
     // FIXME: 数据未初始化前使用默认配置
-    if (!inited.value && !isUndefined(value) && defaultOptions) {
+    if (!inited.value && !isUndefinedOrNullChar(value) && defaultOptions) {
       options.value = defaultOptions
     }
   },

@@ -1,5 +1,5 @@
 import { FormInstance } from 'element-plus'
-import { uniqueId, isBoolean, isObject, isEmpty } from 'lodash-es'
+import { uniqueId, isBoolean, isObject, isEmpty, isUndefined } from 'lodash-es'
 import { ChainMode } from './types'
 import { RemoteColumn, ValueMap, NonModel } from './useColumn'
 
@@ -107,3 +107,5 @@ export const valueMapTo = (model: NonModel, value: any | any[], valueMap?: Value
     }
   }
 }
+
+export const isUndefinedOrNullChar = (val: any) => isUndefined(val) || val === ''

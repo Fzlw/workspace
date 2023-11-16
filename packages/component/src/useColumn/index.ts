@@ -30,8 +30,8 @@ import {
   ColorColumn,
 } from './types'
 import { OneRemoteSelect } from '../RemoteSelect'
-import { isUndefined, isEmpty, get, set } from 'lodash-es'
-import { formatOption, valueMapTo } from '../utils'
+import { isEmpty, get, set } from 'lodash-es'
+import { formatOption, valueMapTo, isUndefinedOrNullChar } from '../utils'
 
 export type NonRType = NonNullable<Column['rType']>
 export type NonModel = NonNullable<FormProps['model']>
@@ -187,11 +187,11 @@ const renderCustom: RenderColumn<CustomColumn> = (model, i, slots) => {
 
 const renderRemote: RenderColumn<RemoteColumn> = (model, i) => {
   const { valueMap, ...other } = i
-  const modelValue = model[i.prop]
+  const modelValue = get(model, i.prop)
   const rawModel = toRaw(model)
   const vK = i.prop ?? 'value'
   const lK = i.labelKey ?? 'label'
-  const options = isUndefined(modelValue)
+  const options = isUndefinedOrNullChar(modelValue)
     ? void 0
     : Array.isArray(modelValue)
     ? modelValue.map((val, j) =>
@@ -202,7 +202,7 @@ const renderRemote: RenderColumn<RemoteColumn> = (model, i) => {
   return h(OneRemoteSelect, {
     defaultOptions: options,
     ...other,
-    modelValue: get(model, i.prop),
+    modelValue,
     'onUpdate:modelValue': (value: any) => {
       set(model, i.prop, value)
     },
