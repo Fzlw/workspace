@@ -184,9 +184,14 @@ const onUpdateModelValue = (val: OptionValue | OptionValue[]) => {
   emit('changeMap', Array.isArray(val) ? val.map((i) => optionsMap.get(i)) : optionsMap.get(val))
 }
 
-onMounted(() => {
-  if (!isUndefined(props.modelValue) && props.defaultOptions) {
-    options.value = props.defaultOptions
-  }
-})
+watch(
+  () => [props.modelValue, props.defaultOptions],
+  ([value, defaultOptions]) => {
+    // FIXME: 数据未初始化前使用默认配置
+    if (!inited.value && !isUndefined(value) && defaultOptions) {
+      options.value = defaultOptions
+    }
+  },
+  { immediate: true }
+)
 </script>
