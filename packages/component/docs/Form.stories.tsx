@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { OneForm as Form, useForm, CustomScope } from '../src'
 import { ref, reactive, toRaw, onMounted, nextTick } from 'vue'
 import React from 'react'
-import { ElButton } from 'element-plus'
+import { ElButton, ElDialog } from 'element-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -458,6 +458,113 @@ export const 远程筛选默认值: Story = {
       template: `
         <Form v-bind="formState">
         </Form>
+      `,
+    }
+  },
+}
+
+export const 远程筛选默认值_表单初始化: Story = {
+  render() {
+    return {
+      components: { Form },
+      setup() {
+        type Data = {
+          remote: string
+          labelVal: string
+        }
+
+        const { formState, setModel } = useForm<Data>({
+          columns: [
+            {
+              rType: 'remote',
+              prop: 'remote',
+              valueKey: 'id',
+              labelKey: 'labelVal',
+              method([p, keyword, _params]) {
+                return new Promise((r) => {
+                  setTimeout(() => {
+                    r({
+                      list: new Array(20).fill(1).map((_, i) => {
+                        return {
+                          labelVal: `l-${p.currentPage}-${i}`,
+                          id: `i-${p.currentPage}-${i}-${keyword || 0}`,
+                        }
+                      }),
+                      total: 50,
+                    })
+                  }, 1000)
+                })
+              },
+              clearable: true,
+              filterable: true,
+              noCache: true,
+            },
+          ],
+        })
+
+        setModel({ remote: 'i-1-2-0', labelVal: 'l-1-2' })
+
+        return { formState }
+      },
+      template: `
+        <Form v-bind="formState">
+        </Form>
+      `,
+    }
+  },
+}
+
+export const 远程筛选默认值_弹窗初始化: Story = {
+  render() {
+    return {
+      components: { Form, ElDialog, ElButton },
+      setup() {
+        type Data = {
+          remote: string
+          labelVal: string
+        }
+
+        const { formState, setModel } = useForm<Data>({
+          columns: [
+            {
+              rType: 'remote',
+              prop: 'remote',
+              valueKey: 'id',
+              labelKey: 'labelVal',
+              method([p, keyword, _params]) {
+                return new Promise((r) => {
+                  setTimeout(() => {
+                    r({
+                      list: new Array(20).fill(1).map((_, i) => {
+                        return {
+                          labelVal: `l-${p.currentPage}-${i}`,
+                          id: `i-${p.currentPage}-${i}-${keyword || 0}`,
+                        }
+                      }),
+                      total: 50,
+                    })
+                  }, 1000)
+                })
+              },
+              clearable: true,
+              filterable: true,
+              noCache: true,
+            },
+          ],
+        })
+
+        const visible = ref(false)
+        const toggle = () => (visible.value = !visible.value)
+        const open = () => setModel({ remote: 'i-1-2-0', labelVal: 'l-1-2' })
+
+        return { formState, toggle, visible, open }
+      },
+      template: `
+        <ElButton @click="toggle">Toggle</ElButton>
+        <ElDialog v-model="visible" @open="open">
+          <Form v-bind="formState">
+          </Form>
+        </ElDialog>
       `,
     }
   },
