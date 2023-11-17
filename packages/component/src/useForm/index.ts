@@ -61,12 +61,12 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    * el-form 组件实例
    */
   const formRef = shallowRef<FormInstance | null>(null)
-  const originColumn = shallowRef(opts.columns.map((i) => formatFormColumn(i)))
+  const originColumns = shallowRef(opts.columns.map((i) => formatFormColumn(i)))
   const formState: FormState<T> = reactive({
     submitting: false,
     // FIXME: Type instantiation is excessively deep and possibly infinite
     model: { ...(opts.initData ?? null) } as any,
-    columns: unref(originColumn).filter((i) => !i.hidden) as any[],
+    columns: unref(originColumns).filter((i) => !i.hidden) as any[],
     ref(instance: any) {
       formRef.value = instance?.elForm
     },
@@ -76,7 +76,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    * 通过prop获取列
    */
   const getColumn = (prop: UseFormColumn['prop']) => {
-    for (const i of unref(originColumn)) {
+    for (const i of unref(originColumns)) {
       if (i.prop === prop) {
         return i
       }
@@ -150,7 +150,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
           }, {} as KMap)
     const newColumns: FormState<T>['columns'] = []
 
-    for (const column of unref(originColumn)) {
+    for (const column of unref(originColumns)) {
       const iProp = column.prop as NonNullable<UseFormColumn['prop']>
 
       if (iProp && iProp in propMap) {
@@ -189,7 +189,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
   const setModel = (obj: Partial<T>, isReset = false) => {
     if (isReset) {
       formState.model = cloneDeep(toRaw(obj)) as T
-      formState.columns = unref(originColumn).filter((i) => !i.hidden)
+      formState.columns = unref(originColumns).filter((i) => !i.hidden)
       // FIXME: resetFields or clearValidate 在useLayout里使用同一个表单实现新增和修改操作 每次打开时要重置表单
       formRef.value?.resetFields()
       return
@@ -211,5 +211,6 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     form: formRef,
     getModel,
     patchColumn,
+    originColumns,
   }
 }

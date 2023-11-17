@@ -8,13 +8,14 @@ import { BaseResult } from '../types'
 import { shallowReactive, unref, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { useCommand } from './useCommand'
-import { noop } from 'lodash-es'
+import { noop, isEmpty } from 'lodash-es'
 import { ExpandColumn } from '../useColumn'
 
 export type UseLayoutColumn = ExpandColumn<
   UseFormColumn,
   {
     disabledType?: Commands[]
+    hiddenType?: Commands[]
   }
 >
 
@@ -68,11 +69,16 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
 
   function command(cmd: Commands, row?: T | null, options?: CommandItem['options']) {
     if (cmd === Commands.post || cmd === Commands.put) {
+      const map: Record<UseLayoutColumn['prop'], boolean> = {}
+
       formOpera.forEachColumns((i) => {
-        const ii = i as UseLayoutColumn
+        const ii = unref(i) as UseLayoutColumn
 
         formOpera.patchColumn(i, { disabled: ii.disabledType?.includes(cmd) })
+        ii.hiddenType?.length && (map[ii.prop] = !ii.hiddenType?.includes(cmd))
       })
+
+      !isEmpty(map) && formOpera.toggleColumn(map)
     }
 
     switch (cmd) {
