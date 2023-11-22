@@ -362,3 +362,55 @@ export const 可隐藏Table列: Story = {
     }
   },
 }
+
+export const 重置Table列: Story = {
+  render: () => {
+    return {
+      components: { Table },
+      setup() {
+        type Data = { date: string; name: string; address: string }
+
+        const { tableState, handleQuery, setState } = useTable<Data>({
+          columns: [
+            { label: 'Date', prop: 'date', rFormat: Format.dateTime },
+            { label: 'Name', prop: 'name' },
+            {
+              label: 'Address',
+              prop: 'address',
+              formatter(_row, _column, _cellValue, _index) {
+                return <div>addrrrrr</div>
+              },
+            },
+          ],
+          query() {
+            return new Promise((r) => {
+              setTimeout(() => {
+                const list = new Array(20).fill({
+                  date: new Date().toString(),
+                  name: 'name',
+                  address: Math.random().toString(),
+                })
+
+                r({ list, total: 100 })
+              }, 1000)
+            })
+          },
+        })
+
+        onMounted(handleQuery)
+
+        const changeColumns = () => {
+          setState({
+            columns: [{ label: 'Name', prop: 'name', formatter: (row) => row.name + 'change' }],
+          })
+        }
+
+        return { tableState, changeColumns }
+      },
+      template: `
+        <Table v-bind="tableState" height=300 />
+        <button @click="changeColumns">改变columns</button>
+      `,
+    }
+  },
+}

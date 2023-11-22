@@ -54,30 +54,29 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     },
     ...opts.pagination,
   })
-  const originColumn = shallowRef<TableState<T>['columns']>(
-    opts.columns.map((i) => {
-      const { defaultValue = '-', rFormat, formatter, ...other } = i
+  const eachColumn = (i: K): UseTableColumn<T> => {
+    const { defaultValue = '-', rFormat, formatter, ...other } = i
 
-      return {
-        ...other,
-        formatter: (row, column, cellValue, index) => {
-          if (formatter) return formatter(row, column, cellValue, index)
+    return {
+      ...other,
+      formatter: (row, column, cellValue, index) => {
+        if (formatter) return formatter(row, column, cellValue, index)
 
-          return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
-        },
-        ...(i.type === 'index' && {
-          index:
-            i.index ??
-            ((j: number) => {
-              if (opts.mode === LoadMode.infinite) return j + 1
+        return defaultFormatter(cellValue, rFormat, defaultValue) ?? cellValue ?? defaultValue
+      },
+      ...(i.type === 'index' && {
+        index:
+          i.index ??
+          ((j: number) => {
+            if (opts.mode === LoadMode.infinite) return j + 1
 
-              return (pagination.currentPage - 1) * pagination.pageSize + j + 1
-            }),
-        }),
-        ...(opts.mapColumn && opts.mapColumn(i)),
-      }
-    })
-  )
+            return (pagination.currentPage - 1) * pagination.pageSize + j + 1
+          }),
+      }),
+      ...(opts.mapColumn && opts.mapColumn(i)),
+    }
+  }
+  const originColumn = shallowRef<TableState<T>['columns']>(opts.columns.map(eachColumn))
   const tableState: TableState<T> = reactive({
     loading: false,
     pending: false,
@@ -136,10 +135,15 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     }
   }
 
-  const setState = (obj: Partial<Pick<TableState<T>, 'data' | 'loading' | 'mode' | 'selected'>>) => {
+  const setState = (obj: Partial<Pick<TableState<T>, 'data' | 'loading' | 'mode' | 'selected'> & { columns: K[] }>) => {
     for (const key in obj) {
       if (key in tableState) {
-        tableState[key as keyof typeof tableState] = obj[key as keyof typeof obj] as never
+        if (key === 'columns' && Array.isArray(obj.columns)) {
+          originColumn.value = obj.columns.map(eachColumn)
+          tableState.columns = unref(originColumn).filter((i) => !i.hidden)
+        } else {
+          tableState[key as keyof typeof tableState] = obj[key as keyof typeof obj] as never
+        }
       }
     }
   }
