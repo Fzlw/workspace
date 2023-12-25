@@ -1,6 +1,6 @@
 {
   "name": "@fzlw/eui-plus",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "",
   "module": "es/index.js",
   "scripts": {

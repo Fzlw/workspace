@@ -4,14 +4,13 @@
     ref="remoteRef"
     :model-value="modelValue"
     :filter-method="filterMethod"
-    :options="options"
     @update:model-value="onUpdateModelValue"
     @visible-change="onVisible"
   >
     <template #empty>
-      <p v-loading="loading" class="el-select-dropdown__empty">{{ noDataText }}</p>
+      <p v-loading="loading" class="el-select-dropdown__empty">{{ loading ? '&nbsp;' : noDataText }}</p>
     </template>
-    <ElOption v-for="i in options" v-bind="i" :key="i.key"> </ElOption>
+    <ElOption v-for="i in options" v-bind="i" :key="i.key" />
   </ElSelect>
 </template>
 
@@ -51,11 +50,11 @@ const inited = ref(false) // 数据初始化
 const initedScroll = ref(false) // 无限列表初始
 const remoteRef = shallowRef()
 const pagination = reactive<Pagination>({ currentPage: 1, pageSize: 20, total: 0 })
-const keyword = ref()
+const keyword = ref('')
 let optionsMap = new Map<ElOptionProps['value'], any>()
 let timer: null | number = null
 
-const filterMethod = (queryStr?: string) => {
+const filterMethod = (queryStr = '') => {
   timer && clearTimeout(timer)
   timer = window.setTimeout(() => {
     if (inited.value && !loading.value && remoteRef.value?.visible) {
@@ -163,7 +162,7 @@ onBeforeUnmount(destoryScroll)
 
 const onVisible = (val: boolean) => {
   if (val) {
-    if (!inited.value && !loading.value) {
+    if ((!inited.value || props.noCache) && !loading.value) {
       options.value = []
 
       query()
@@ -172,7 +171,6 @@ const onVisible = (val: boolean) => {
     if (keyword.value || props.noCache) {
       options.value = []
       pagination.currentPage = 1
-      inited.value = false
       keyword.value = ''
     }
   }

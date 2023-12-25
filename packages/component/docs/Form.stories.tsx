@@ -288,6 +288,7 @@ export const 远程筛选: Story = {
               rType: 'remote',
               prop: 'remote',
               valueKey: 'id',
+              labelKey: 'labelName',
               valueMap: { id: 'iot' },
               method([p, keyword, params]) {
                 console.log('query:', p, keyword, params)
@@ -297,7 +298,7 @@ export const 远程筛选: Story = {
                     r({
                       list: new Array(20).fill(1).map((_, i) => {
                         return {
-                          label: `${p.currentPage}-${i}-${keyword}`,
+                          labelName: `ll-${p.currentPage}-${i}-${keyword}`,
                           id: `${p.currentPage}-${i}-${keyword}`,
                           value: {
                             id: `${p.currentPage}-${i}-${keyword}`,
@@ -307,19 +308,39 @@ export const 远程筛选: Story = {
                       }),
                       total: 50,
                     })
-                  }, 1000)
+                  }, 300)
                 })
               },
               multiple: true,
-              renderLabel(i) {
-                return i.label
-              },
               onChange(val) {
                 console.log('onChange', val)
               },
               clearable: true,
               filterable: true,
               noCache: true,
+            },
+            {
+              label: '区域',
+              prop: 'eqp_area_id',
+              rType: 'remote',
+              valueKey: 'id',
+              labelKey: 'label',
+              noCache: true,
+              filterable: true,
+              method() {
+                return new Promise((r) => {
+                  setTimeout(() => {
+                    r({
+                      list: new Array(20).fill(1).map((i, j) => {
+                        return {
+                          label: `机台区域_0822_${j}`,
+                          id: j,
+                        }
+                      }),
+                    })
+                  }, 500)
+                })
+              },
             },
           ],
         })
