@@ -5,6 +5,7 @@ import { ExpandColumn, ExcludeColumn, renderColumn } from '../useColumn'
 import { UseFormColumn, formatFormColumn } from '../useForm'
 import { UseTableOptions, defaultFormatter, TableState } from '../useTable'
 import { UseEditTableColumn, EditTableRow, useEditTable } from '../useEditTable'
+import { LoadMode } from '../Table'
 
 export type UseVerifyEditTableColumn<T> = ExpandColumn<UseEditTableColumn<T>, ExcludeColumn<UseFormColumn, 'hidden'>>
 
@@ -42,6 +43,17 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
       }
     },
     ...opts,
+    ...(opts.query && {
+      query(p) {
+        if (p.currentPage === 1 || unref(tableState).mode === LoadMode.single) {
+          if (unref(model)) {
+            model.value = null
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return opts.query!(p)
+      },
+    }),
   })
 
   const verifyForm = shallowRef<FormInstance | null>(null)
