@@ -5,7 +5,7 @@ import { readonly, computed, unref } from 'vue'
 
 export type UseEditTableColumn<T> = ExpandColumn<Column, UseTableColumn<T> & { editable?: boolean }>
 export interface EditTableRow {
-  _origin?: Omit<EditTableRow, '_editing' | '_delete' | '_origin'>
+  _origin?: Omit<EditTableRow, '_editing' | '_delete' | '_origin' | '_new'>
   _editing?: boolean
   _delete?: boolean
   _new?: boolean
@@ -77,10 +77,24 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     row._editing = false
   }
 
-  const addRow = (row?: Partial<T>) => {
+  const addRow = (row?: Partial<T>, position = -1) => {
     const newRow = { _editing: true, ...(row ?? null), _new: true, _origin: row ? cloneDeep(row) : void 0 } as T
+    const result: T[] = []
+    const len = tableState.data.length
+    const p = position < 0 ? len + 1 + position : position
+    const index = p >= 0 ? Math.min(len, p) : 0
 
-    setState({ data: tableState.data.concat(newRow) })
+    for (let i = 0, ii = 0; i < len; i++) {
+      const current = tableState.data[i]
+
+      ii === index && result.push(newRow)
+      !current._delete && ii++
+      result.push(current)
+    }
+
+    if (index === len) result.push(newRow)
+
+    setState({ data: result })
 
     return newRow
   }
@@ -170,6 +184,10 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     setState(obj)
   }
 
+  const cloneRow = (row: T) => {
+    return cloneDeep(row._origin) ?? ({} as T)
+  }
+
   return {
     ...other,
     tableState: editTableState,
@@ -184,5 +202,6 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     rowIsAdded,
     setState: setEditTableState,
     moveRow,
+    cloneRow,
   }
 }

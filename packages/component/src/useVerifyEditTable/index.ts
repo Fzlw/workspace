@@ -104,10 +104,10 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
     }
   }
 
-  const vAddRow = (row?: T) => {
+  const vAddRow = (row?: T, position = -1) => {
     if (unref(model)) return
 
-    const newRow = addRow(row)
+    const newRow = addRow(row, position)
 
     model.value = newRow as UnwrapRef<T>
 

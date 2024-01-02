@@ -85,14 +85,14 @@ export const 可编辑表格: Story = {
             return new Promise((r) => {
               setTimeout(() => {
                 const list = [
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
-                  { date: new Date().toString(), name: 'name', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name1', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name2', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name3', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name4', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name5', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name6', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name7', address: Math.random().toString() },
+                  { date: new Date().toString(), name: 'name8', address: Math.random().toString() },
                 ]
 
                 r({ list, total: 100 })
@@ -110,7 +110,9 @@ export const 可编辑表格: Story = {
         return { tableState, addRow, getChanged }
       },
       template: `
-        <button @click="addRow()">新增</button>
+        <button @click="addRow()">新增到末尾</button>
+        <button @click="addRow(null, 2)">新增到第3</button>
+        <button @click="addRow(null, -3)">新增到倒数第3</button>
         <button @click="getChanged">获取修改过的行</button>
         <Table v-bind="tableState" height=300 />
       `,
