@@ -1,9 +1,11 @@
-import{o as C,a as t,b as e}from"./vue.esm-bundler-2b92b106.js";import"./index-c013ead5.js";import{_ as u}from"./el-message-box-8a9f8ff9.js";import{u as R}from"./index-2d279225.js";import"./_commonjsHelpers-725317a4.js";import"./index-6a8811e1.js";import"./cloneDeep-1581ee03.js";const y={title:"Example/OneEditTable",component:u,tags:["autodocs"],parameters:{docs:{description:{component:`可编辑表格基于 OneTable 实现 搭配useEditTable使用即可实现可编辑表格
-不带有验证功能`}}}},a={render:()=>({components:{Table:u},setup(){const{tableState:m,handleQuery:i,editRow:l,cancelRow:g,delRow:c,saveRow:b,rowIsEditing:p,addRow:w,getChangedRows:S,moveRow:o}=R({columns:[{label:"Date",prop:"date",rFormat:0,rType:"date"},{label:"Name",prop:"name"},{label:"Address",prop:"address",elProps:{formatter(n){return n+"-"}}},{label:"state",prop:"state",editable:!1,formatter(n){return p(n)?"编辑中":"-"}},{label:"opera",prop:"",editable:!1,formatter(n){return t("div",null,[t("button",{onClick:()=>l(n)},[e("edit")]),t("button",{onClick:()=>c(n)},[e("delete")]),t("button",{onClick:()=>g(n)},[e("cancel")]),t("button",{onClick:()=>b(n)},[e("save")]),t("button",{onClick:()=>o(n,-1)},[e("move prev")]),t("button",{onClick:()=>o(n,1)},[e("move next")]),t("button",{onClick:()=>o(n,1,!1)},[e("move to 2")])])}}],query(){return new Promise(n=>{setTimeout(()=>{const h=[{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()},{date:new Date().toString(),name:"name",address:Math.random().toString()}];n({list:h,total:100})},1e3)})}});return C(i),{tableState:m,addRow:w,getChanged:()=>{console.log(S())}}},template:`
-        <button @click="addRow()">新增</button>
+import{o as C,a as t,b as e}from"./vue.esm-bundler-2b92b106.js";import"./index-c013ead5.js";import{_ as s}from"./el-message-box-8a9f8ff9.js";import{u as R}from"./index-5085b121.js";import"./_commonjsHelpers-725317a4.js";import"./index-6a8811e1.js";import"./cloneDeep-1581ee03.js";const B={title:"Example/OneEditTable",component:s,tags:["autodocs"],parameters:{docs:{description:{component:`可编辑表格基于 OneTable 实现 搭配useEditTable使用即可实现可编辑表格
+不带有验证功能`}}}},a={render:()=>({components:{Table:s},setup(){const{tableState:l,handleQuery:i,editRow:m,cancelRow:c,delRow:b,saveRow:g,rowIsEditing:w,addRow:p,getChangedRows:S,moveRow:o}=R({columns:[{label:"Date",prop:"date",rFormat:0,rType:"date"},{label:"Name",prop:"name"},{label:"Address",prop:"address",elProps:{formatter(n){return n+"-"}}},{label:"state",prop:"state",editable:!1,formatter(n){return w(n)?"编辑中":"-"}},{label:"opera",prop:"",editable:!1,formatter(n){return t("div",null,[t("button",{onClick:()=>m(n)},[e("edit")]),t("button",{onClick:()=>b(n)},[e("delete")]),t("button",{onClick:()=>c(n)},[e("cancel")]),t("button",{onClick:()=>g(n)},[e("save")]),t("button",{onClick:()=>o(n,-1)},[e("move prev")]),t("button",{onClick:()=>o(n,1)},[e("move next")]),t("button",{onClick:()=>o(n,1,!1)},[e("move to 2")])])}}],query(){return new Promise(n=>{setTimeout(()=>{const h=[{date:new Date().toString(),name:"name1",address:Math.random().toString()},{date:new Date().toString(),name:"name2",address:Math.random().toString()},{date:new Date().toString(),name:"name3",address:Math.random().toString()},{date:new Date().toString(),name:"name4",address:Math.random().toString()},{date:new Date().toString(),name:"name5",address:Math.random().toString()},{date:new Date().toString(),name:"name6",address:Math.random().toString()},{date:new Date().toString(),name:"name7",address:Math.random().toString()},{date:new Date().toString(),name:"name8",address:Math.random().toString()}];n({list:h,total:100})},1e3)})}});return C(i),{tableState:l,addRow:p,getChanged:()=>{console.log(S())}}},template:`
+        <button @click="addRow()">新增到末尾</button>
+        <button @click="addRow(null, 2)">新增到第3</button>
+        <button @click="addRow(null, -3)">新增到倒数第3</button>
         <button @click="getChanged">获取修改过的行</button>
         <Table v-bind="tableState" height=300 />
-      `})};var r,d,s;a.parameters={...a.parameters,docs:{...(r=a.parameters)==null?void 0:r.docs,source:{originalSource:`{
+      `})};var r,d,u;a.parameters={...a.parameters,docs:{...(r=a.parameters)==null?void 0:r.docs,source:{originalSource:`{
   render: () => {
     return {
       components: {
@@ -71,35 +73,35 @@ import{o as C,a as t,b as e}from"./vue.esm-bundler-2b92b106.js";import"./index-c
               setTimeout(() => {
                 const list = [{
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name1',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name2',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name3',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name4',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name5',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name6',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name7',
                   address: Math.random().toString()
                 }, {
                   date: new Date().toString(),
-                  name: 'name',
+                  name: 'name8',
                   address: Math.random().toString()
                 }];
                 r({
@@ -121,11 +123,13 @@ import{o as C,a as t,b as e}from"./vue.esm-bundler-2b92b106.js";import"./index-c
         };
       },
       template: \`
-        <button @click="addRow()">新增</button>
+        <button @click="addRow()">新增到末尾</button>
+        <button @click="addRow(null, 2)">新增到第3</button>
+        <button @click="addRow(null, -3)">新增到倒数第3</button>
         <button @click="getChanged">获取修改过的行</button>
         <Table v-bind="tableState" height=300 />
       \`
     };
   }
-}`,...(s=(d=a.parameters)==null?void 0:d.docs)==null?void 0:s.source}}};const B=["可编辑表格"];export{B as __namedExportsOrder,y as default,a as 可编辑表格};
-//# sourceMappingURL=EditTable.stories-3ac0fcef.js.map
+}`,...(u=(d=a.parameters)==null?void 0:d.docs)==null?void 0:u.source}}};const y=["可编辑表格"];export{y as __namedExportsOrder,B as default,a as 可编辑表格};
+//# sourceMappingURL=EditTable.stories-cd10afbd.js.map
