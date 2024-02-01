@@ -294,6 +294,20 @@ export const 远程筛选: Story = {
                 console.log('query:', p, keyword, params)
 
                 return new Promise((r) => {
+                  if (keyword.indexOf('1') !== -1) {
+                    return r({
+                      list: [
+                        {
+                          labelName: `ll-${p.currentPage}-0-${keyword}`,
+                          id: `${p.currentPage}-0-${keyword}`,
+                          value: {
+                            id: `${p.currentPage}-0-${keyword}`,
+                            i: 0,
+                          },
+                        },
+                      ],
+                    })
+                  }
                   setTimeout(() => {
                     r({
                       list: new Array(20).fill(1).map((_, i) => {
@@ -348,6 +362,7 @@ export const 远程筛选: Story = {
         return { formState }
       },
       template: `
+        <p>输入 1 只返回一项</p>
         <Form v-bind="formState">
         </Form>
       `,
@@ -413,7 +428,7 @@ export const 远程筛选默认值: Story = {
                       list: new Array(20).fill(1).map((_, i) => {
                         return {
                           label2: `l2-${p.currentPage}-${i}`,
-                          id: `i2-${p.currentPage}-${i}-${keyword ?? 0}`,
+                          id: `i2-${p.currentPage}-${i}-${keyword || 0}`,
                           value: {
                             id: `${p.currentPage}-${i}-${keyword}`,
                             i,
@@ -444,7 +459,7 @@ export const 远程筛选默认值: Story = {
                       list: new Array(20).fill(1).map((_, i) => {
                         return {
                           label3: `l3-${p.currentPage}-${i}`,
-                          id: `i3-${p.currentPage}-${i}-${keyword ?? 0}`,
+                          id: `i3-${p.currentPage}-${i}-${keyword || 0}`,
                           value: {
                             id: `${p.currentPage}-${i}-${keyword}`,
                             i,
@@ -586,6 +601,56 @@ export const 远程筛选默认值_弹窗初始化: Story = {
           <Form v-bind="formState">
           </Form>
         </ElDialog>
+      `,
+    }
+  },
+}
+
+export const 远程筛选查询: Story = {
+  render() {
+    return {
+      components: { Form },
+      setup() {
+        type Data = {
+          name: string
+        }
+
+        const { formState } = useForm<Data>({
+          columns: [
+            {
+              label: '区域',
+              prop: 'name',
+              rType: 'remote',
+              valueKey: 'id',
+              labelKey: 'label',
+              filterable: true,
+              multiple: true,
+              collapseTags: true,
+              method([, keyword]) {
+                return new Promise((resolve) => {
+                  if (keyword.indexOf('1') !== -1) {
+                    return resolve({ list: [{ id: 100, label: '100' }] })
+                  }
+                  resolve({
+                    list: new Array(20).fill(1).map((i, j) => {
+                      return {
+                        label: `机台区域_0822_${j}`,
+                        id: j,
+                      }
+                    }),
+                  })
+                })
+              },
+            },
+          ],
+        })
+
+        return { formState }
+      },
+      template: `
+        <p>输入 1 只返回一项</p>
+        <Form v-bind="formState">
+        </Form>
       `,
     }
   },

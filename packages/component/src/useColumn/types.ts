@@ -82,7 +82,7 @@ export interface RemoteColumn extends BaseColumn, SelectProps {
   rType: 'remote'
   params?: Record<string, any>
   method: (
-    query: [p: Pagination, keyword?: string, params?: RemoteColumn['params']]
+    query: [p: Pagination, keyword: string, params?: RemoteColumn['params']]
   ) => BaseResult<any> | Promise<BaseResult<any>>
   renderLabel?: (i: any) => ElOptionProps['label']
   valueMap?: ValueMap

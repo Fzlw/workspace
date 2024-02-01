@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, shallowRef } from 'vue'
+import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, shallowRef, onMounted } from 'vue'
 import { ElSelect, vLoading, ElInfiniteScroll, ElOption } from 'element-plus'
 import 'element-plus/es/components/loading/style/css'
 import { Pagination } from '../types'
@@ -162,7 +162,7 @@ onBeforeUnmount(destoryScroll)
 
 const onVisible = (val: boolean) => {
   if (val) {
-    if ((!inited.value || props.noCache) && !loading.value) {
+    if (!inited.value && !loading.value) {
       options.value = []
 
       query()
@@ -172,6 +172,7 @@ const onVisible = (val: boolean) => {
       options.value = []
       pagination.currentPage = 1
       keyword.value = ''
+      inited.value = false
     }
   }
 }
@@ -181,14 +182,10 @@ const onUpdateModelValue = (val: OptionValue | OptionValue[]) => {
   emit('changeMap', Array.isArray(val) ? val.map((i) => optionsMap.get(i)) : optionsMap.get(val))
 }
 
-watch(
-  () => [props.modelValue, props.defaultOptions],
-  ([value, defaultOptions]) => {
-    // FIXME: 数据未初始化前使用默认配置
-    if (!inited.value && !isUndefinedOrNullChar(value) && defaultOptions) {
-      options.value = defaultOptions
-    }
-  },
-  { immediate: true }
-)
+onMounted(() => {
+  // FIXME: 数据未初始化前使用默认配置
+  if (!inited.value && !isUndefinedOrNullChar(props.modelValue) && props.defaultOptions) {
+    options.value = props.defaultOptions
+  }
+})
 </script>
