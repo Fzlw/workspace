@@ -13,7 +13,7 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
   const visible = ref(false)
   const dialogProps = ref({})
 
-  const submit = (post?: SubmitPost<T>) => {
+  const submit = (post = opts.post) => {
     return other.submit(async (model) => {
       // FIXME: 快速点击情况下 当提交结束关闭弹窗过程中会再次触发
       visible.value && post && (await post(model))

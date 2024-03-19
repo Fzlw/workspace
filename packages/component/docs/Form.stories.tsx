@@ -329,6 +329,9 @@ export const 远程筛选: Story = {
               onChange(val) {
                 console.log('onChange', val)
               },
+              'onVisible-change'(val) {
+                console.log('onVisible-change', val)
+              },
               clearable: true,
               filterable: true,
               noCache: true,

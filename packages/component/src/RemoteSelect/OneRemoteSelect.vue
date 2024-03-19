@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', val: any): void
   (e: 'changeMap', val: Props['modelValue'] | Props['modelValue'][]): void
+  (e: 'visible-change', val: boolean): void
 }>()
 
 const options = ref<ElOptionProps[]>([])
@@ -175,6 +176,7 @@ const onVisible = (val: boolean) => {
       inited.value = false
     }
   }
+  emit('visible-change', val)
 }
 
 const onUpdateModelValue = (val: OptionValue | OptionValue[]) => {
