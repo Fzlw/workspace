@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, shallowRef, onMounted } from 'vue'
+import { reactive, ref, unref, watch, nextTick, onBeforeUnmount, shallowRef } from 'vue'
 import { ElSelect, vLoading, ElInfiniteScroll, ElOption } from 'element-plus'
 import 'element-plus/es/components/loading/style/css'
 import { Pagination } from '../types'
@@ -47,8 +47,8 @@ const emit = defineEmits<{
 const options = ref<ElOptionProps[]>([])
 
 const loading = ref(false)
-const inited = ref(false) // 数据初始化
-const initedScroll = ref(false) // 无限列表初始
+const inited = ref(false) // 数据刷新标识
+const initedScroll = ref(false) // 无限列表初始化 生命周期内只会初始化一次
 const remoteRef = shallowRef()
 const pagination = reactive<Pagination>({ currentPage: 1, pageSize: 20, total: 0 })
 const keyword = ref('')
@@ -184,10 +184,14 @@ const onUpdateModelValue = (val: OptionValue | OptionValue[]) => {
   emit('changeMap', Array.isArray(val) ? val.map((i) => optionsMap.get(i)) : optionsMap.get(val))
 }
 
-onMounted(() => {
-  // FIXME: 数据未初始化前使用默认配置
-  if (!inited.value && !isUndefinedOrNullChar(props.modelValue) && props.defaultOptions) {
-    options.value = props.defaultOptions
-  }
-})
+watch(
+  () => props.defaultOptions,
+  (defaultOptions) => {
+    // FIXME: 数据未初始化前使用默认配置
+    if (!initedScroll.value && !isUndefinedOrNullChar(props.modelValue) && defaultOptions?.length) {
+      options.value = defaultOptions
+    }
+  },
+  { immediate: true }
+)
 </script>

@@ -541,7 +541,7 @@ export const 远程筛选默认值_表单初始化: Story = {
           ],
         })
 
-        setModel({ remote: 'i-1-2-0', labelVal: 'l-1-2' })
+        onMounted(() => setModel({ remote: 'i-1-2-0', labelVal: 'l-1-2' }))
 
         return { formState }
       },
