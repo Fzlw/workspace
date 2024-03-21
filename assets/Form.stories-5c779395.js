@@ -1,13 +1,14 @@
-import{d as fe,o as ye,r as Ee,t as Se,n as Te,a as _e,b as he}from"./vue.esm-bundler-2b92b106.js";import{a as l,E as d,b as we}from"./el-message-box-76cb5148.js";import{u}from"./index-669bc05d.js";import"./index-c013ead5.js";import"./_commonjsHelpers-725317a4.js";import"./cloneDeep-8078fb08.js";const qe={title:"Example/OneForm",component:l,tags:["autodocs"],argTypes:{columns:{description:"列信息",defaultValue:{summary:"FormColumn[]"},control:{type:"object"}},model:{description:"表单数据对象(同el-form)",defaultValue:{summary:"object"},control:{type:"object"}}},parameters:{docs:{description:{component:`完全基于 el-form 组件 除列举的props外 其他$attrs会透传至el-form
-https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},columns:[{prop:"name",formItemProps:{prop:"name",label:"name",required:!0}},{prop:"age",rType:"number",min:1,formItemProps:{prop:"age",label:"age"}},{rType:"date",label:"date",prop:"date",formItemProps:{prop:"date",label:"date"}}]},render(r){return{components:{Form:l},setup(){const e=fe();return{args:r,formRef:e,click:()=>{var a;(a=e.value)==null||a.elForm.validate(o=>{console.log("valid",o)})}}},template:`
+import{d as fe,o as ye,r as Ee,t as Te,n as Se,a as we,b as _e}from"./vue.esm-bundler-2b92b106.js";import{a as l,E as d,b as he}from"./el-message-box-76cb5148.js";import{u}from"./index-ab80c28c.js";import"./index-c013ead5.js";import"./_commonjsHelpers-725317a4.js";import"./cloneDeep-8078fb08.js";const Me={title:"Example/OneForm",component:l,tags:["autodocs"],argTypes:{columns:{description:"列信息",defaultValue:{summary:"FormColumn[]"},control:{type:"object"}},model:{description:"表单数据对象(同el-form)",defaultValue:{summary:"object"},control:{type:"object"}}},parameters:{docs:{description:{component:`完全基于 el-form 组件 除列举的props外 其他$attrs会透传至el-form
+https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},columns:[{prop:"name",formItemProps:{prop:"name",label:"name",required:!0}},{prop:"age",rType:"number",min:1,formItemProps:{prop:"age",label:"age"}},{rType:"date",label:"date",prop:"date",formItemProps:{prop:"date",label:"date"}}]},render(r){return{components:{Form:l},setup(){const e=fe();return{args:r,formRef:e,click:()=>{var o;(o=e.value)==null||o.elForm.validate(a=>{console.log("valid",a)})}}},template:`
         <button @click="click">submit</button>
         <Form v-bind="args" class="frfr" ref='formRef'>
           <template #custom="{ model }">
             <div>customcustom {{model.name}}</div>
           </template>
         </Form>
-      `}}},s={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r,submit:e}=u({columns:[{label:"文本输入框",prop:"name",requiredMsg:"name 必填"},{label:"数字输入框",prop:"age",rType:"number",min:1},{label:"单独选框",prop:"opera-single",rType:"checkbox",border:!0},{label:"多选框",prop:"opera",rType:"checkboxGroup",options:[{label:"多选1",value:1},{label:"多选2",value:2},{label:"多选3",value:3},{label:"多选4",value:4},{label:"多选5",value:5}]},{label:"单选框",prop:"radio",rType:"radio",options:[{label:"单选1",value:1},{label:"单选2",value:2},{label:"单选3",value:3},{label:"单选4",value:4},{label:"单选5",value:5}]},{rType:"date",prop:"date",label:"日期选择"},{label:"选择器",prop:"select",rType:"select",options:[{label:"选择1",value:1},{label:"选择2",value:2},{label:"选择3",value:3},{label:"选择4",value:4},{label:"选择5",value:5}]},{label:"开关",rType:"switch",prop:"switch",inlinePrompt:!0,activeText:"是",inactiveText:"否"},{rType:"color",prop:"color",label:"颜色选择"}]});return{formState:r,click:()=>{e(a=>{console.log(a)})}}},template:`
+      `}}},s={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r,submit:e,setModel:n}=u({columns:[{label:"文本输入框",prop:"name",requiredMsg:"name 必填"},{label:"数字输入框",prop:"age",rType:"number",min:1},{label:"单独选框",prop:"opera-single",rType:"checkbox",border:!0},{rType:"date",type:"daterange",prop:"time"},{label:"多选框",prop:"opera",rType:"checkboxGroup",options:[{label:"多选1",value:1},{label:"多选2",value:2},{label:"多选3",value:3},{label:"多选4",value:4},{label:"多选5",value:5}]},{label:"单选框",prop:"radio",rType:"radio",options:[{label:"单选1",value:1},{label:"单选2",value:2},{label:"单选3",value:3},{label:"单选4",value:4},{label:"单选5",value:5}]},{rType:"date",prop:"date",label:"日期选择"},{label:"选择器",prop:"select",rType:"select",options:[{label:"选择1",value:1},{label:"选择2",value:2},{label:"选择3",value:3},{label:"选择4",value:4},{label:"选择5",value:5}]},{label:"开关",rType:"switch",prop:"switch",inlinePrompt:!0,activeText:"是",inactiveText:"否"},{rType:"color",prop:"color",label:"颜色选择"}],initData:{time:[new Date("2024-02-01"),new Date("2024-02-20")]}});return{formState:r,click:()=>{e(m=>{console.log(m)})},reset:()=>n({},!0)}},template:`
         <ElButton @click="click">submit</ElButton>
+        <ElButton @click="reset">reset</ElButton>
         <Form v-bind="formState">
           <span>8765e</span>
         </Form>
@@ -17,45 +18,45 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
             <div>这是一段自定义内容 {{ model.name }}</div>
           </template>
         </Form>
-      `}}},p={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{label:"请输入内容",prop:"name"},{rType:"custom",prop:"",render(e){return _e("div",null,[he("JSX这是一段自定义内容:"),e.model.name])}}]});return{formState:r}},template:`
+      `}}},p={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{label:"请输入内容",prop:"name"},{rType:"custom",prop:"",render(e){return we("div",null,[_e("JSX这是一段自定义内容:"),e.model.name])}}]});return{formState:r}},template:`
         <Form v-bind="formState">
         </Form>
-      `}}},i={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelName",valueMap:{id:"iot"},method([e,n,a]){return console.log("query:",e,n,a),new Promise(o=>{if(n.indexOf("1")!==-1)return o({list:[{labelName:`ll-${e.currentPage}-0-${n}`,id:`${e.currentPage}-0-${n}`,value:{id:`${e.currentPage}-0-${n}`,i:0}}]});setTimeout(()=>{o({list:new Array(20).fill(1).map((m,t)=>({labelName:`ll-${e.currentPage}-${t}-${n}`,id:`${e.currentPage}-${t}-${n}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},300)})},multiple:!0,onChange(e){console.log("onChange",e)},"onVisible-change"(e){console.log("onVisible-change",e)},clearable:!0,filterable:!0,noCache:!0},{label:"区域",prop:"eqp_area_id",rType:"remote",valueKey:"id",labelKey:"label",noCache:!0,filterable:!0,method(){return new Promise(e=>{setTimeout(()=>{e({list:new Array(20).fill(1).map((n,a)=>({label:`机台区域_0822_${a}`,id:a}))})},500)})}}]});return{formState:r}},template:`
+      `}}},i={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelName",valueMap:{id:"iot"},method([e,n,o]){return console.log("query:",e,n,o),new Promise(a=>{if(n.indexOf("1")!==-1)return a({list:[{labelName:`ll-${e.currentPage}-0-${n}`,id:`${e.currentPage}-0-${n}`,value:{id:`${e.currentPage}-0-${n}`,i:0}}]});setTimeout(()=>{a({list:new Array(20).fill(1).map((m,t)=>({labelName:`ll-${e.currentPage}-${t}-${n}`,id:`${e.currentPage}-${t}-${n}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},300)})},multiple:!0,onChange(e){console.log("onChange",e)},"onVisible-change"(e){console.log("onVisible-change",e)},clearable:!0,filterable:!0,noCache:!0},{label:"区域",prop:"eqp_area_id",rType:"remote",valueKey:"id",labelKey:"label",noCache:!0,filterable:!0,method(){return new Promise(e=>{setTimeout(()=>{e({list:new Array(20).fill(1).map((n,o)=>({label:`机台区域_0822_${o}`,id:o}))})},500)})}}]});return{formState:r}},template:`
         <p>输入 1 只返回一项</p>
         <Form v-bind="formState">
         </Form>
-      `}}},F={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",method([e,n,a]){return new Promise(o=>{setTimeout(()=>{o({list:new Array(20).fill(1).map((m,t)=>({label:`l-${e.currentPage}-${t}`,id:`i-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label},clearable:!0,filterable:!0,noCache:!0},{rType:"remote",prop:"remote2",valueKey:"id",labelKey:"label2",method([e,n,a]){return new Promise(o=>{setTimeout(()=>{o({list:new Array(20).fill(1).map((m,t)=>({label2:`l2-${e.currentPage}-${t}`,id:`i2-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label2+"=="},clearable:!0,filterable:!0,noCache:!1},{rType:"remote",prop:"remote3",valueKey:"id",labelKey:"label3",method([e,n,a]){return new Promise(o=>{setTimeout(()=>{o({list:new Array(20).fill(1).map((m,t)=>({label3:`l3-${e.currentPage}-${t}`,id:`i3-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label3},clearable:!0,filterable:!0,multiple:!0}],initData:{remote:"i-1-0-0",label:"l-1-0",remote2:"i2-1-1-0",label2:"l2-1-1",remote3:["i3-1-2-0","i3-1-3-0"],label3:["l3-1-2","l3-1-3"]}});return{formState:r}},template:`
+      `}}},F={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",method([e,n,o]){return new Promise(a=>{setTimeout(()=>{a({list:new Array(20).fill(1).map((m,t)=>({label:`l-${e.currentPage}-${t}`,id:`i-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label},clearable:!0,filterable:!0,noCache:!0},{rType:"remote",prop:"remote2",valueKey:"id",labelKey:"label2",method([e,n,o]){return new Promise(a=>{setTimeout(()=>{a({list:new Array(20).fill(1).map((m,t)=>({label2:`l2-${e.currentPage}-${t}`,id:`i2-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label2+"=="},clearable:!0,filterable:!0,noCache:!1},{rType:"remote",prop:"remote3",valueKey:"id",labelKey:"label3",method([e,n,o]){return new Promise(a=>{setTimeout(()=>{a({list:new Array(20).fill(1).map((m,t)=>({label3:`l3-${e.currentPage}-${t}`,id:`i3-${e.currentPage}-${t}-${n||0}`,value:{id:`${e.currentPage}-${t}-${n}`,i:t}})),total:50})},1e3)})},renderLabel(e){return e.label3},clearable:!0,filterable:!0,multiple:!0}],initData:{remote:"i-1-0-0",label:"l-1-0",remote2:"i2-1-1-0",label2:"l2-1-1",remote3:["i3-1-2-0","i3-1-3-0"],label3:["l3-1-2","l3-1-3"]}});return{formState:r}},template:`
         <Form v-bind="formState">
         </Form>
-      `}}},v={render(){return{components:{Form:l},setup(){const{formState:r,setModel:e}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelVal",method([n,a,o]){return new Promise(m=>{setTimeout(()=>{m({list:new Array(20).fill(1).map((t,T)=>({labelVal:`l-${n.currentPage}-${T}`,id:`i-${n.currentPage}-${T}-${a||0}`})),total:50})},1e3)})},clearable:!0,filterable:!0,noCache:!0}]});return ye(()=>e({remote:"i-1-2-0",labelVal:"l-1-2"})),{formState:r}},template:`
+      `}}},v={render(){return{components:{Form:l},setup(){const{formState:r,setModel:e}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelVal",method([n,o,a]){return new Promise(m=>{setTimeout(()=>{m({list:new Array(20).fill(1).map((t,S)=>({labelVal:`l-${n.currentPage}-${S}`,id:`i-${n.currentPage}-${S}-${o||0}`})),total:50})},1e3)})},clearable:!0,filterable:!0,noCache:!0}]});return ye(()=>e({remote:"i-1-2-0",labelVal:"l-1-2"})),{formState:r}},template:`
         <Form v-bind="formState">
         </Form>
-      `}}},f={render(){return{components:{Form:l,ElDialog:we,ElButton:d},setup(){const{formState:r,setModel:e}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelVal",method([m,t,T]){return new Promise($e=>{setTimeout(()=>{$e({list:new Array(20).fill(1).map((Pe,_)=>({labelVal:`l-${m.currentPage}-${_}`,id:`i-${m.currentPage}-${_}-${t||0}`})),total:50})},1e3)})},clearable:!0,filterable:!0,noCache:!0}]}),n=fe(!1);return{formState:r,toggle:()=>n.value=!n.value,visible:n,open:()=>e({remote:"i-1-2-0",labelVal:"l-1-2"})}},template:`
+      `}}},f={render(){return{components:{Form:l,ElDialog:he,ElButton:d},setup(){const{formState:r,setModel:e}=u({columns:[{rType:"remote",prop:"remote",valueKey:"id",labelKey:"labelVal",method([m,t,S]){return new Promise($e=>{setTimeout(()=>{$e({list:new Array(20).fill(1).map((Be,w)=>({labelVal:`l-${m.currentPage}-${w}`,id:`i-${m.currentPage}-${w}-${t||0}`})),total:50})},1e3)})},clearable:!0,filterable:!0,noCache:!0}]}),n=fe(!1);return{formState:r,toggle:()=>n.value=!n.value,visible:n,open:()=>e({remote:"i-1-2-0",labelVal:"l-1-2"})}},template:`
         <ElButton @click="toggle">Toggle</ElButton>
         <ElDialog v-model="visible" @open="open">
           <Form v-bind="formState">
           </Form>
         </ElDialog>
-      `}}},y={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{label:"区域",prop:"name",rType:"remote",valueKey:"id",labelKey:"label",filterable:!0,multiple:!0,collapseTags:!0,method([,e]){return new Promise(n=>{if(e.indexOf("1")!==-1)return n({list:[{id:100,label:"100"}]});n({list:new Array(20).fill(1).map((a,o)=>({label:`机台区域_0822_${o}`,id:o}))})})}}]});return{formState:r}},template:`
+      `}}},y={render(){return{components:{Form:l},setup(){const{formState:r}=u({columns:[{label:"区域",prop:"name",rType:"remote",valueKey:"id",labelKey:"label",filterable:!0,multiple:!0,collapseTags:!0,method([,e]){return new Promise(n=>{if(e.indexOf("1")!==-1)return n({list:[{id:100,label:"100"}]});n({list:new Array(20).fill(1).map((o,a)=>({label:`机台区域_0822_${a}`,id:a}))})})}}]});return{formState:r}},template:`
         <p>输入 1 只返回一项</p>
         <Form v-bind="formState">
         </Form>
-      `}}},$={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r,toggleColumn:e,setModel:n}=u({columns:[{label:"name",prop:"name"},{label:"age",prop:"age"},{rType:"radio",prop:"show",options:[{label:"显示",value:1},{label:"隐藏",value:0}],onChange(o){e("opera",o===1)}},{label:"opera",prop:"opera"}],initData:{show:1,age:1}});return{formState:r,reset:()=>{n({show:1,age:1},!0)}}},template:`
+      `}}},$={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r,toggleColumn:e,setModel:n}=u({columns:[{label:"name",prop:"name"},{label:"age",prop:"age"},{rType:"radio",prop:"show",options:[{label:"显示",value:1},{label:"隐藏",value:0}],onChange(a){e("opera",a===1)}},{label:"opera",prop:"opera"}],initData:{show:1,age:1}});return{formState:r,reset:()=>{n({show:1,age:1},!0)}}},template:`
         <ElButton @click="reset">reset</ElButton>
         <Form v-bind="formState">
         </Form>
-      `}}},E={render(){return{components:{Form:l,ElButton:d},setup(){const r=Ee({age:11}),{formState:e,setModel:n}=u({columns:[{label:"文本输入框",prop:"name",requiredMsg:"name 必填"},{label:"数字输入框",prop:"age",rType:"number",min:1}],initData:Se(r)});return{formState:e,reset:()=>{n({age:11},!0)}}},template:`
+      `}}},E={render(){return{components:{Form:l,ElButton:d},setup(){const r=Ee({age:11}),{formState:e,setModel:n}=u({columns:[{label:"文本输入框",prop:"name",requiredMsg:"name 必填"},{label:"数字输入框",prop:"age",rType:"number",min:1}],initData:Te(r)});return{formState:e,reset:()=>{n({age:11},!0)}}},template:`
         <ElButton @click="reset">reset</ElButton>
         <Form v-bind="formState">
           <span>8765e</span>
         </Form>
-      `}}},S={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r}=u({columns:[{label:"下拉框",prop:"selectVal",rType:"select",valueKey:"id",labelKey:"name",valueMap:{eqp_list:"eqpList",remark:"remarkremark"},options:[{name:"m-lw",eqp_area_id:6,remark:"test21212111111111",id:2,create_time:"2023-06-02 11:21:15",update_time:"2023-06-05 09:56:27",eqp_total:7,eqp_list:[{id:3,number:"lw3",status:4}]}],onChange(e){console.log("onChange",e)}}]});return{formState:r}},template:`
+      `}}},T={render(){return{components:{Form:l,ElButton:d},setup(){const{formState:r}=u({columns:[{label:"下拉框",prop:"selectVal",rType:"select",valueKey:"id",labelKey:"name",valueMap:{eqp_list:"eqpList",remark:"remarkremark"},options:[{name:"m-lw",eqp_area_id:6,remark:"test21212111111111",id:2,create_time:"2023-06-02 11:21:15",update_time:"2023-06-05 09:56:27",eqp_total:7,eqp_list:[{id:3,number:"lw3",status:4}]}],onChange(e){console.log("onChange",e)}}]});return{formState:r}},template:`
         <Form v-bind="formState">
         </Form>
-      `}}},c={render(){return{components:{Form:l},setup(){const{formState:r,form:e}=u({columns:[{label:"下拉框",prop:"selectVal",rType:"select",valueKey:"id",labelKey:"name",valueMap:{eqp_list:"eqpList",remark:"remarkremark"},options:[{name:"m-lw",eqp_area_id:6,remark:"test21212111111111",id:2,create_time:"2023-06-02 11:21:15",update_time:"2023-06-05 09:56:27",eqp_total:7,eqp_list:[{id:3,number:"lw3",status:4}]}],onChange(n){console.log("onChange",n)}}]});return ye(()=>{Te(()=>{console.log("组件实例：",e.value)})}),{formState:r}},template:`
+      `}}},c={render(){return{components:{Form:l},setup(){const{formState:r,form:e}=u({columns:[{label:"下拉框",prop:"selectVal",rType:"select",valueKey:"id",labelKey:"name",valueMap:{eqp_list:"eqpList",remark:"remarkremark"},options:[{name:"m-lw",eqp_area_id:6,remark:"test21212111111111",id:2,create_time:"2023-06-02 11:21:15",update_time:"2023-06-05 09:56:27",eqp_total:7,eqp_list:[{id:3,number:"lw3",status:4}]}],onChange(n){console.log("onChange",n)}}]});return ye(()=>{Se(()=>{console.log("组件实例：",e.value)})}),{formState:r}},template:`
         <Form v-bind="formState">
         </Form>
-      `}}};var h,w,P;b.parameters={...b.parameters,docs:{...(h=b.parameters)==null?void 0:h.docs,source:{originalSource:`{
+      `}}};var _,h,B;b.parameters={...b.parameters,docs:{...(_=b.parameters)==null?void 0:_.docs,source:{originalSource:`{
   args: {
     model: {},
     columns: [{
@@ -111,7 +112,7 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
       \`
     };
   }
-}`,...(P=(w=b.parameters)==null?void 0:w.docs)==null?void 0:P.source}}};var k,B,D,C,A;s.parameters={...s.parameters,docs:{...(k=s.parameters)==null?void 0:k.docs,source:{originalSource:`{
+}`,...(B=(h=b.parameters)==null?void 0:h.docs)==null?void 0:B.source}}};var P,k,D,C,A;s.parameters={...s.parameters,docs:{...(P=s.parameters)==null?void 0:P.docs,source:{originalSource:`{
   render() {
     return {
       components: {
@@ -125,10 +126,12 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
           opera: number[];
           radio: number;
           date: Date;
+          time: [Date, Date];
         };
         const {
           formState,
-          submit
+          submit,
+          setModel
         } = useForm<Data>({
           columns: [{
             label: '文本输入框',
@@ -144,6 +147,10 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
             prop: 'opera-single',
             rType: 'checkbox',
             border: true
+          }, {
+            rType: 'date',
+            type: 'daterange',
+            prop: 'time'
           }, {
             label: '多选框',
             prop: 'opera',
@@ -219,28 +226,34 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
             rType: 'color',
             prop: 'color',
             label: '颜色选择'
-          }]
+          }],
+          initData: {
+            time: [new Date('2024-02-01'), new Date('2024-02-20')]
+          }
         });
         const click = () => {
           submit(model => {
             console.log(model);
           });
         };
+        const reset = () => setModel({}, true);
         return {
           formState,
-          click
+          click,
+          reset
         };
       },
       template: \`
         <ElButton @click="click">submit</ElButton>
+        <ElButton @click="reset">reset</ElButton>
         <Form v-bind="formState">
           <span>8765e</span>
         </Form>
       \`
     };
   }
-}`,...(D=(B=s.parameters)==null?void 0:B.docs)==null?void 0:D.source},description:{story:`OneForm 组件实例 ref此时由useForm 代理
-需要使用组件实例可以使用 const { form } = useForm()`,...(A=(C=s.parameters)==null?void 0:C.docs)==null?void 0:A.description}}};var K,q,M;g.parameters={...g.parameters,docs:{...(K=g.parameters)==null?void 0:K.docs,source:{originalSource:`{
+}`,...(D=(k=s.parameters)==null?void 0:k.docs)==null?void 0:D.source},description:{story:`OneForm 组件实例 ref此时由useForm 代理
+需要使用组件实例可以使用 const { form } = useForm()`,...(A=(C=s.parameters)==null?void 0:C.docs)==null?void 0:A.description}}};var K,M,q;g.parameters={...g.parameters,docs:{...(K=g.parameters)==null?void 0:K.docs,source:{originalSource:`{
   render() {
     return {
       components: {
@@ -278,7 +291,7 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
       \`
     };
   }
-}`,...(M=(q=g.parameters)==null?void 0:q.docs)==null?void 0:M.source}}};var V,x,L,j,N;p.parameters={...p.parameters,docs:{...(V=p.parameters)==null?void 0:V.docs,source:{originalSource:`{
+}`,...(q=(M=g.parameters)==null?void 0:M.docs)==null?void 0:q.source}}};var V,x,L,j,N;p.parameters={...p.parameters,docs:{...(V=p.parameters)==null?void 0:V.docs,source:{originalSource:`{
   render() {
     return {
       components: {
@@ -835,7 +848,7 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
       \`
     };
   }
-}`,...(se=(me=E.parameters)==null?void 0:me.docs)==null?void 0:se.source}}};var pe,ie,ce;S.parameters={...S.parameters,docs:{...(pe=S.parameters)==null?void 0:pe.docs,source:{originalSource:`{
+}`,...(se=(me=E.parameters)==null?void 0:me.docs)==null?void 0:se.source}}};var pe,ie,ce;T.parameters={...T.parameters,docs:{...(pe=T.parameters)==null?void 0:pe.docs,source:{originalSource:`{
   render() {
     return {
       components: {
@@ -885,7 +898,7 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
       \`
     };
   }
-}`,...(ce=(ie=S.parameters)==null?void 0:ie.docs)==null?void 0:ce.source}}};var de,be,ge,Fe,ve;c.parameters={...c.parameters,docs:{...(de=c.parameters)==null?void 0:de.docs,source:{originalSource:`{
+}`,...(ce=(ie=T.parameters)==null?void 0:ie.docs)==null?void 0:ce.source}}};var de,be,ge,Fe,ve;c.parameters={...c.parameters,docs:{...(de=c.parameters)==null?void 0:de.docs,source:{originalSource:`{
   render() {
     return {
       components: {
@@ -940,5 +953,5 @@ https://element-plus.org/zh-CN/component/form.html`}}}},b={args:{model:{},column
       \`
     };
   }
-}`,...(ge=(be=c.parameters)==null?void 0:be.docs)==null?void 0:ge.source},description:{story:"打开控制台查看",...(ve=(Fe=c.parameters)==null?void 0:Fe.docs)==null?void 0:ve.description}}};const Me=["基础用例","配合useForm使用","自定义内容Template","自定义内容Jsx","远程筛选","远程筛选默认值","远程筛选默认值_表单初始化","远程筛选默认值_弹窗初始化","远程筛选查询","隐藏显示切换","初始化数据","下拉选项映射","获取ElForm组件实例"];export{Me as __namedExportsOrder,qe as default,S as 下拉选项映射,E as 初始化数据,b as 基础用例,p as 自定义内容Jsx,g as 自定义内容Template,c as 获取ElForm组件实例,i as 远程筛选,y as 远程筛选查询,F as 远程筛选默认值,f as 远程筛选默认值_弹窗初始化,v as 远程筛选默认值_表单初始化,s as 配合useForm使用,$ as 隐藏显示切换};
-//# sourceMappingURL=Form.stories-74fb0ee1.js.map
+}`,...(ge=(be=c.parameters)==null?void 0:be.docs)==null?void 0:ge.source},description:{story:"打开控制台查看",...(ve=(Fe=c.parameters)==null?void 0:Fe.docs)==null?void 0:ve.description}}};const qe=["基础用例","配合useForm使用","自定义内容Template","自定义内容Jsx","远程筛选","远程筛选默认值","远程筛选默认值_表单初始化","远程筛选默认值_弹窗初始化","远程筛选查询","隐藏显示切换","初始化数据","下拉选项映射","获取ElForm组件实例"];export{qe as __namedExportsOrder,Me as default,T as 下拉选项映射,E as 初始化数据,b as 基础用例,p as 自定义内容Jsx,g as 自定义内容Template,c as 获取ElForm组件实例,i as 远程筛选,y as 远程筛选查询,F as 远程筛选默认值,f as 远程筛选默认值_弹窗初始化,v as 远程筛选默认值_表单初始化,s as 配合useForm使用,$ as 隐藏显示切换};
+//# sourceMappingURL=Form.stories-5c779395.js.map
