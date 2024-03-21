@@ -1,4 +1,4 @@
-import { shallowRef, unref, toRaw, reactive } from 'vue'
+import { shallowRef, unref, toRaw, reactive, onMounted } from 'vue'
 import { isUndefined, cloneDeep } from 'lodash-es'
 import { FormItemProps, FormInstance } from 'element-plus'
 import { FormColumn as OriginFormColumn } from '../Form'
@@ -64,8 +64,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
   const originColumns = shallowRef(opts.columns.map((i) => formatFormColumn(i)))
   const formState: FormState<T> = reactive({
     submitting: false,
-    // FIXME: Type instantiation is excessively deep and possibly infinite
-    model: { ...(opts.initData ?? null) } as any,
+    model: {} as any,
     columns: unref(originColumns).filter((i) => !i.hidden) as any[],
     ref(instance: any) {
       formRef.value = instance?.elForm
@@ -188,18 +187,34 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    */
   const setModel = (obj: Partial<T>, isReset = false) => {
     if (isReset) {
-      formState.model = cloneDeep(toRaw(obj)) as T
-      formState.columns = unref(originColumns).filter((i) => !i.hidden)
-      // FIXME: resetFields or clearValidate 在useLayout里使用同一个表单实现新增和修改操作 每次打开时要重置表单
-      formRef.value?.resetFields()
-      return
+      const keys: string[] = []
+      const newCols: FormState<T>['columns'] = []
+
+      for (const i of unref(originColumns)) {
+        i.prop && keys.push(i.prop)
+        !i.hidden && newCols.push(i)
+      }
+      for (const key in formState.model) {
+        formState.model[key] = undefined as any
+      }
+
+      formState.columns = newCols
+      formRef.value?.resetFields(keys)
     }
-    formState.model = { ...formState.model, ...obj }
+    for (const key in obj) {
+      formState.model[key] = cloneDeep(obj[key]) as any
+    }
   }
 
   const getModel = <K extends keyof T = keyof T>(key: K): T[K] => {
     return formState.model[key]
   }
+
+  onMounted(() => {
+    if (opts.initData) {
+      setModel(cloneDeep(opts.initData))
+    }
+  })
 
   return {
     formState,

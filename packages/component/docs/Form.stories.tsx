@@ -111,9 +111,10 @@ export const 配合useForm使用: Story = {
           opera: number[]
           radio: number
           date: Date
+          time: [Date, Date]
         }
 
-        const { formState, submit } = useForm<Data>({
+        const { formState, submit, setModel } = useForm<Data>({
           columns: [
             { label: '文本输入框', prop: 'name', requiredMsg: 'name 必填' },
             { label: '数字输入框', prop: 'age', rType: 'number', min: 1 },
@@ -122,6 +123,11 @@ export const 配合useForm使用: Story = {
               prop: 'opera-single',
               rType: 'checkbox',
               border: true,
+            },
+            {
+              rType: 'date',
+              type: 'daterange',
+              prop: 'time',
             },
             {
               label: '多选框',
@@ -174,6 +180,7 @@ export const 配合useForm使用: Story = {
               label: '颜色选择',
             },
           ],
+          initData: { time: [new Date('2024-02-01'), new Date('2024-02-20')] },
         })
 
         const click = () => {
@@ -181,11 +188,13 @@ export const 配合useForm使用: Story = {
             console.log(model)
           })
         }
+        const reset = () => setModel({}, true)
 
-        return { formState, click }
+        return { formState, click, reset }
       },
       template: `
         <ElButton @click="click">submit</ElButton>
+        <ElButton @click="reset">reset</ElButton>
         <Form v-bind="formState">
           <span>8765e</span>
         </Form>
