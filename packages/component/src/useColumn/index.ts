@@ -146,7 +146,8 @@ const renderCheckbox: RenderColumn<CheckboxColumn> = (model, i) => {
 
   return h(ElCheckbox, {
     ...i,
-    modelValue: get(model, i.prop),
+    // FIXME: 设置为 undefined 时 UI 不一致
+    modelValue: get(model, i.prop, false),
     'onUpdate:modelValue': (value) => {
       set(model, i.prop, value)
     },

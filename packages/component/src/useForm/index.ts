@@ -199,7 +199,8 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
       }
 
       formState.columns = newCols
-      formRef.value?.resetFields(keys)
+      // resetFields 会重置为初始值 这里只需清除验证信息即可
+      setTimeout(() => formRef.value?.clearValidate(keys), 0)
     }
     for (const key in obj) {
       formState.model[key] = cloneDeep(obj[key]) as any
