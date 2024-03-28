@@ -1,3 +1,4 @@
+import { Slots } from 'vue'
 import {
   InputNumberInstance,
   DatePickerProps,
@@ -18,6 +19,7 @@ export type ExtProps<T, K extends keyof T = any> = Partial<Omit<T, K>>
 
 export interface BaseColumn {
   prop: string
+  slots?: Slots
 }
 
 export interface InputColumn extends BaseColumn, ExtProps<InputInstance['$props'], 'label'> {

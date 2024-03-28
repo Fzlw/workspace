@@ -40,14 +40,18 @@ export type RenderColumn<T extends BaseColumn> = (model: NonModel, i: T, slots?:
 const renderInput: RenderColumn<InputColumn> = (model, i) => {
   const { formatter: _f, elProps = null, ...other } = i
 
-  return h(ElInput, {
-    ...other,
-    ...elProps,
-    modelValue: get(model, i.prop),
-    'onUpdate:modelValue': (value) => {
-      set(model, i.prop, value)
+  return h(
+    ElInput,
+    {
+      ...other,
+      ...elProps,
+      modelValue: get(model, i.prop),
+      'onUpdate:modelValue': (value) => {
+        set(model, i.prop, value)
+      },
     },
-  })
+    i.slots
+  )
 }
 
 const renderNumber: RenderColumn<NumberColumn> = (model, i) => {
@@ -61,13 +65,17 @@ const renderNumber: RenderColumn<NumberColumn> = (model, i) => {
 }
 
 const renderDate: RenderColumn<DateColumn> = (model, i) => {
-  return h(ElDatePicker, {
-    ...i,
-    modelValue: get(model, i.prop),
-    'onUpdate:modelValue': (value) => {
-      set(model, i.prop, value)
+  return h(
+    ElDatePicker,
+    {
+      ...i,
+      modelValue: get(model, i.prop),
+      'onUpdate:modelValue': (value) => {
+        set(model, i.prop, value)
+      },
     },
-  })
+    i.slots
+  )
 }
 
 const renderSelect: RenderColumn<SelectColumn> = (model, i) => {
@@ -100,6 +108,7 @@ const renderSelect: RenderColumn<SelectColumn> = (model, i) => {
       },
     },
     {
+      ...i.slots,
       default: () =>
         i.options.map((option, index) => {
           return h(ElOption, {
@@ -144,14 +153,18 @@ const renderCheckbox: RenderColumn<CheckboxColumn> = (model, i) => {
     return renderCheckboxGroup(model, i as unknown as CheckboxGroupColumn)
   }
 
-  return h(ElCheckbox, {
-    ...i,
-    // FIXME: 设置为 undefined 时 UI 不一致
-    modelValue: get(model, i.prop, false),
-    'onUpdate:modelValue': (value) => {
-      set(model, i.prop, value)
+  return h(
+    ElCheckbox,
+    {
+      ...i,
+      // FIXME: 设置为 undefined 时 UI 不一致
+      modelValue: get(model, i.prop, false),
+      'onUpdate:modelValue': (value) => {
+        set(model, i.prop, value)
+      },
     },
-  })
+    i.slots
+  )
 }
 
 const renderCheckboxGroup: RenderColumn<CheckboxGroupColumn> = (model, i) => {
@@ -214,13 +227,17 @@ const renderRemote: RenderColumn<RemoteColumn> = (model, i) => {
 }
 
 const renderSwitch: RenderColumn<SwitchColumn> = (model, i) => {
-  return h(ElSwitch, {
-    ...i,
-    modelValue: get(model, i.prop),
-    'onUpdate:modelValue': (value) => {
-      set(model, i.prop, value)
+  return h(
+    ElSwitch,
+    {
+      ...i,
+      modelValue: get(model, i.prop),
+      'onUpdate:modelValue': (value) => {
+        set(model, i.prop, value)
+      },
     },
-  })
+    i.slots
+  )
 }
 
 const renderColorPicker: RenderColumn<ColorColumn> = (model, i) => {

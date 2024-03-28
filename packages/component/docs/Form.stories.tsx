@@ -116,18 +116,37 @@ export const 配合useForm使用: Story = {
 
         const { formState, submit, setModel } = useForm<Data>({
           columns: [
-            { label: '文本输入框', prop: 'name', requiredMsg: 'name 必填' },
+            {
+              label: '文本输入框',
+              prop: 'name',
+              requiredMsg: 'name 必填',
+              slots: {
+                prefix: () => {
+                  return [<span>900</span>, <span>500</span>]
+                },
+              },
+            },
             { label: '数字输入框', prop: 'age', rType: 'number', min: 1 },
             {
               label: '单独选框',
               prop: 'opera-single',
               rType: 'checkbox',
               border: true,
+              slots: {
+                default: () => {
+                  return [<span>defaultdefault</span>]
+                },
+              },
             },
             {
               rType: 'date',
               type: 'daterange',
               prop: 'time',
+              slots: {
+                'range-separator': () => {
+                  return [<span>range-separator</span>]
+                },
+              },
             },
             {
               label: '多选框',
@@ -165,6 +184,11 @@ export const 配合useForm使用: Story = {
                 { label: '选择4', value: 4 },
                 { label: '选择5', value: 5 },
               ],
+              slots: {
+                prefix: () => {
+                  return [<span>prefix</span>]
+                },
+              },
             },
             {
               label: '开关',
@@ -173,6 +197,12 @@ export const 配合useForm使用: Story = {
               inlinePrompt: true,
               activeText: '是',
               inactiveText: '否',
+              slots: {
+                // 2.4.4 新增
+                'active-action': () => {
+                  return [<span class='custom-active-action'>T</span>]
+                },
+              },
             },
             {
               rType: 'color',
