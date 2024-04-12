@@ -48,8 +48,14 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     visible.value = false
   }
 
+  const close = () => {
+    if (opts.onClose) return opts.onClose()
+
+    other.setModel({}, true)
+  }
+
   watch(visible, (val) => {
-    val ? opts.onOpen?.() : opts.onClose?.()
+    val ? opts.onOpen?.() : close()
   })
 
   const forEachColumns = (cb: (i: FormColumn, index: number, arr: FormColumn[]) => void) =>
