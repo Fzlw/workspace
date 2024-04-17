@@ -47,7 +47,7 @@ export const 基础用例: Story = {
       setup() {
         type Row = { date: string; name: string; address: string }
 
-        const { verifyTableState, handleQuery, editRow, cancelRow, delRow, saveRow, rowIsEditing, addRow } =
+        const { verifyTableState, handleQuery, editRow, cancelRow, delRow, saveRow, rowIsEditing, addRow, setColumn } =
           useVerifyEditTable<Row>({
             columns: [
               { label: 'Date', prop: 'date', rFormat: 0, rType: 'date' },
@@ -55,6 +55,10 @@ export const 基础用例: Story = {
               {
                 label: 'Address',
                 prop: 'address',
+              },
+              {
+                label: 'Custom',
+                prop: 'custom',
               },
               {
                 label: 'state',
@@ -69,9 +73,13 @@ export const 基础用例: Story = {
                 prop: '',
                 editable: false,
                 formatter(row) {
+                  const onEdit = () => {
+                    setColumn('custom', { editable: false })
+                    editRow(row)
+                  }
                   return (
                     <div>
-                      <div onClick={() => editRow(row)}>edit</div>
+                      <div onClick={onEdit}>edit</div>
                       <div onClick={() => delRow(row)}>delete</div>
                       <div onClick={() => cancelRow(row)}>cancel</div>
                       <div onClick={() => saveRow(row)}>save</div>
@@ -83,9 +91,12 @@ export const 基础用例: Story = {
             query() {
               return new Promise((r) => {
                 setTimeout(() => {
-                  const list = new Array(10)
-                    .fill(0)
-                    .map(() => ({ date: new Date().toString(), name: 'name', address: Math.random().toString() }))
+                  const list = new Array(10).fill(0).map(() => ({
+                    date: new Date().toString(),
+                    name: 'name',
+                    address: Math.random().toString(),
+                    custom: '新增时可编辑',
+                  }))
 
                   r({ list, total: 100 })
                 }, 1000)
@@ -95,10 +106,15 @@ export const 基础用例: Story = {
 
         onMounted(handleQuery)
 
-        return { tableState: verifyTableState, addRow }
+        const onAdd = () => {
+          setColumn('custom', { editable: true })
+          addRow({} as any)
+        }
+
+        return { tableState: verifyTableState, onAdd }
       },
       template: `
-        <button @click="addRow({})">add</button>
+        <button @click="onAdd">add</button>
         <Table v-bind="tableState" height=300 />
       `,
     }

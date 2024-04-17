@@ -22,7 +22,7 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
       return {
         ...other,
         formatter(row, column, cellValue, index) {
-          if ((isUndefined(editable) || editable === true) && (row as any)._editing) {
+          if ((isUndefined(editable) || editable === true) && row._editing) {
             return renderColumn(row, i) ?? ''
           }
 
@@ -49,10 +49,12 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
   })
 
   const setColumn = (prop: Column['prop'], obj: Partial<UseEditTableColumn<T>>) => {
-    tableState.columns = tableState.columns.map((i) => {
-      if (i.prop === prop) return Object.assign(i, obj)
+    setState({
+      columns: opts.columns.map((i) => {
+        if (i.prop === prop) return Object.assign({}, i, obj)
 
-      return i
+        return i
+      }),
     })
   }
 
