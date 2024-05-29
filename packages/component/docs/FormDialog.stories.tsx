@@ -81,7 +81,7 @@ export const 基础用例: Story = {
           opera: number[]
         }
 
-        const { formDialogState, submit, show, hide } = useFormDialog<Data>({
+        const { formDialogState, submit, show, hide, setColumn } = useFormDialog<Data>({
           columns: [
             { label: 'name', prop: 'name', requiredMsg: 'name 必填' },
             { label: 'age', prop: 'age', rType: 'number', min: 1 },
@@ -96,6 +96,9 @@ export const 基础用例: Story = {
                 { label: '操作4', value: 4 },
                 { label: '操作5', value: 5 },
               ],
+              onChange() {
+                setColumn('remote', { disabled: false })
+              },
             },
             {
               rType: 'remote',
@@ -103,6 +106,7 @@ export const 基础用例: Story = {
               params: {},
               valueKey: 'id',
               valueMap: { id: 'iot' },
+              disabled: true,
               method([p, keyword, params]) {
                 console.log('query:', p, keyword, params)
 

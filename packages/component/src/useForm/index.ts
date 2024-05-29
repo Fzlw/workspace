@@ -92,7 +92,7 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     obj: Partial<ExcludeColumn<UseFormColumn, 'hidden'>> | null,
     newVal?: any
   ) => {
-    for (const column of formState.columns) {
+    for (const column of unref(originColumns)) {
       if (column.prop === prop) {
         for (const originColumn of opts.columns) {
           if (originColumn.prop === prop) {
@@ -106,6 +106,8 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
         break
       }
     }
+
+    formState.columns = formState.columns.slice()
 
     if (!isUndefined(newVal)) {
       formState.model[prop as keyof FormState<T>['model']] = newVal
@@ -151,12 +153,12 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
 
     for (const column of unref(originColumns)) {
       const iProp = column.prop as NonNullable<UseFormColumn['prop']>
+      const hidden =
+        iProp && iProp in propMap ? (isUndefined(propMap[iProp]) ? !column.hidden : !propMap[iProp]) : column.hidden
 
-      if (iProp && iProp in propMap) {
-        column.hidden = isUndefined(propMap[iProp]) ? !column.hidden : !propMap[iProp]
-      }
+      column.hidden = hidden
 
-      !column.hidden && newColumns.push(column)
+      if (!hidden) newColumns.push(column)
     }
 
     formState.columns = newColumns
@@ -189,16 +191,23 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     if (isReset) {
       const keys: string[] = []
       const newCols: FormState<T>['columns'] = []
+      const newOriginCols: FormState<T>['columns'] = []
 
       for (const i of unref(originColumns)) {
-        i.prop && keys.push(i.prop)
-        !i.hidden && newCols.push(i)
+        if (i.prop) keys.push(i.prop)
+      }
+      for (const i of opts.columns) {
+        const column = formatFormColumn(i)
+
+        if (!column.hidden) newCols.push(column)
+        newOriginCols.push(column)
       }
       for (const key in formState.model) {
         formState.model[key] = undefined as any
       }
 
       formState.columns = newCols
+      originColumns.value = newOriginCols
       // resetFields 会重置为初始值 这里只需清除验证信息即可
       setTimeout(() => formRef.value?.clearValidate(keys), 0)
     }
