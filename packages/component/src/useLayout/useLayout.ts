@@ -2,11 +2,11 @@ import { Pagination } from '../types'
 import { LoadMode } from '../Table'
 import { UseTableColumn, useTable } from '../useTable'
 import { UseFormColumn, useForm } from '../useForm'
-import { useFormDialog, UseFormDialogOptions } from '../useFormDialog'
-import { Commands, CommandItem, CommandOpt, CommandDialogItem, CommandBoxItem } from './types'
+import { useFormDialog, UseFormDialogOptions, DialogAndDrawer } from '../useFormDialog'
+import { Commands, CommandOpt, CommandOptions } from './types'
 import { BaseResult } from '../types'
 import { shallowReactive, unref, watch } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElMessageBoxOptions } from 'element-plus'
 import { useCommand } from './useCommand'
 import { noop, isEmpty } from 'lodash-es'
 import { ExpandColumn } from '../useColumn'
@@ -25,6 +25,7 @@ export interface UseLayoutOptions<T, Q, K> {
   put?: UseFormDialogOptions<K>['post']
   delete?: (row: T) => any
   export?: (row: T | null | undefined, query: Q, p: Pagination) => any
+  // TODO: 下一版本移除掉
   commands?: CommandOpt<T>
   commandColumn?: UseTableColumn<T>
   columns?: UseTableColumn<T>[]
@@ -62,13 +63,16 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
     align = 'center', // 默认居中展示
   } = opts
 
-  function command(cmd: Commands.post, row?: T | null, options?: CommandDialogItem['options']): void
-  function command(cmd: Commands.put, row?: T | null, options?: CommandDialogItem['options']): void
-  function command(cmd: Commands.delete, row: T, options?: CommandBoxItem['options']): void
-  function command(cmd: Commands.export, row?: T | null): void
+  function command<O extends Commands>(cmd: O, row?: T | null, options?: CommandOptions[O]): Promise<void> {
+    const rowT = row ?? ({} as T)
+    const { promise, resolve, reject } = Promise.withResolvers<void>()
 
-  function command(cmd: Commands, row?: T | null, options?: CommandItem['options']) {
-    if (cmd === Commands.post || cmd === Commands.put) {
+    if (
+      cmd === Commands.post ||
+      cmd === Commands.put ||
+      cmd === Commands.postByDrawer ||
+      cmd === Commands.putByDrawer
+    ) {
       const map: Record<UseLayoutColumn['prop'], boolean> = {}
 
       formOpera.forEachColumns((i) => {
@@ -83,27 +87,43 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
 
     switch (cmd) {
       case Commands.post:
-        formOpera.setModel(row ?? {}, true)
+      case Commands.postByDrawer:
+        formOpera.setModel(rowT, true)
         formOpera.show({
           title: '新增',
-          ...(options as CommandDialogItem['options']),
+          ...(options as DialogAndDrawer),
+          onClosed: () => {
+            ;(options as any)?.onClosed?.()
+            reject()
+          },
           onSubmit: () => {
             mixedState.posting = true
 
-            return formOpera.submit(post).finally(() => (mixedState.posting = false))
+            return formOpera
+              .submit(post)
+              .then(resolve)
+              .finally(() => (mixedState.posting = false))
           },
         })
         break
 
       case Commands.put:
-        formOpera.setModel(row ?? {}, true)
+      case Commands.putByDrawer:
+        formOpera.setModel(rowT, true)
         formOpera.show({
           title: '修改',
-          ...(options as CommandDialogItem['options']),
+          ...(options as DialogAndDrawer),
+          onClosed: () => {
+            ;(options as any)?.onClosed?.()
+            reject()
+          },
           onSubmit: () => {
             mixedState.puting = true
 
-            return formOpera.submit(put).finally(() => (mixedState.puting = false))
+            return formOpera
+              .submit(put)
+              .then(resolve)
+              .finally(() => (mixedState.puting = false))
           },
         })
         break
@@ -117,13 +137,15 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
           cancelButtonText: '取消',
           showCancelButton: true,
           confirmButtonClass: 'el-button--danger',
-          ...(options as CommandBoxItem['options']),
+          ...(options as ElMessageBoxOptions),
         })
           .then(() => {
             mixedState.deleting = true
 
-            return dM?.(row as T)
+            return dM?.(rowT)
           })
+          .then(resolve)
+          .catch(reject)
           .finally(() => (mixedState.deleting = false))
         break
 
@@ -132,11 +154,19 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
           .then(() => {
             mixedState.exporting = true
 
-            return eM?.(row, unref(queryState.model), unref(pagination))
+            return eM?.(rowT, unref(queryState.model), unref(pagination))
           })
+          .then(resolve)
+          .catch(reject)
           .finally(() => (mixedState.exporting = false))
         break
+
+      default:
+        resolve()
+        break
     }
+
+    return promise
   }
 
   const commandColumns = commands ? useCommand<T>(commands, command, commandColumn) : null

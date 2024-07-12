@@ -1,5 +1,5 @@
 <template>
-  <ElDialog
+  <ElDrawer
     v-bind="$attrs"
     :model-value="visible"
     @update:model-value="(value: boolean) => emit('update:modelValue', value)"
@@ -30,16 +30,16 @@
         </ElButton>
       </slot>
     </template>
-  </ElDialog>
+  </ElDrawer>
 </template>
 
 <script setup lang="ts">
-import { ElDialog, ElButton, ButtonProps } from 'element-plus'
+import { ElDrawer, ElButton, ButtonProps } from 'element-plus'
 import { OneFormProps, OneForm } from '../Form'
-import { ElDialogProps } from './types'
+import { ElDrawerProps } from './types'
 
 export interface Props {
-  visible: ElDialogProps['modelValue']
+  visible: ElDrawerProps['modelValue']
   formState: OneFormProps
   noText?: string
   okText?: string
@@ -53,7 +53,7 @@ const _props = withDefaults(defineProps<Props>(), {
   okText: '确定',
 })
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: ElDialogProps['modelValue']): void
+  (e: 'update:modelValue', data: ElDrawerProps['modelValue']): void
   (e: 'submit'): void
 }>()
 

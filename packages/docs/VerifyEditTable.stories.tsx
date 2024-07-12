@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { nextTick, onMounted } from 'vue'
-import React from 'react'
 
-import { OneVerifyEditTable as Table, useVerifyEditTable } from '../src'
+import { OneVerifyEditTable as Table, useVerifyEditTable } from '@fzlw/eui-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -64,7 +63,7 @@ export const 基础用例: Story = {
                 label: 'state',
                 prop: 'state',
                 editable: false,
-                formatter(row) {
+                formatter(row): string {
                   return rowIsEditing(row) ? '编辑中' : '-'
                 },
               },
@@ -142,7 +141,7 @@ export const 获取ElForm和ElTable组件实例: Story = {
                 label: 'state',
                 prop: 'state',
                 editable: false,
-                formatter(row) {
+                formatter(row): string {
                   return rowIsEditing(row) ? '编辑中' : '-'
                 },
               },

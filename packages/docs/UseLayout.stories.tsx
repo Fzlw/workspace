@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { onMounted } from 'vue'
 import { ElPagination, ElMessage, ElButton } from 'element-plus'
 
-import { Format, useLayout, OneTable, Commands, OneFormDialog, OneForm } from '../src'
+import { Format, useLayout, OneTable, Commands, OneFormDialog, OneForm } from '@fzlw/eui-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -81,6 +81,49 @@ export const 基础用例: Story = {
             { label: 'name', prop: 'name' },
             { label: 'age', prop: 'age' },
             { label: 'date', prop: 'date', rFormat: Format.dateTime },
+            {
+              label: '操作',
+              prop: 'opera',
+              formatter(row) {
+                return (
+                  <>
+                    <ElButton
+                      type='primary'
+                      link
+                      onClick={() =>
+                        command(Commands.put, row, { title: '来编辑' })
+                          .then(() => console.log('put then'))
+                          .catch(() => console.log('put catch'))
+                      }
+                    >
+                      编辑
+                    </ElButton>
+                    <ElButton
+                      type='primary'
+                      link
+                      onClick={() =>
+                        command(Commands.export, row)
+                          .then(() => console.log('export then'))
+                          .catch(() => console.log('export catch'))
+                      }
+                    >
+                      导出
+                    </ElButton>
+                    <ElButton
+                      type='danger'
+                      link
+                      onClick={() =>
+                        command(Commands.delete, row, { title: '98765', type: 'error' })
+                          .then(() => console.log('delete then'))
+                          .catch(() => console.log('delete catch'))
+                      }
+                    >
+                      删除
+                    </ElButton>
+                  </>
+                )
+              },
+            },
           ],
           queryColumns: [
             { label: 'name', prop: 'name' },
@@ -136,17 +179,6 @@ export const 基础用例: Story = {
               }, 1000)
             })
           },
-          commands: [
-            { label: '编辑', command: Commands.put, options: { title: '来编辑' } },
-            { label: '导出', command: Commands.export },
-            {
-              label: '删除',
-              command: Commands.delete,
-              link: true,
-              type: 'danger',
-              options: { title: '98765', type: 'error' },
-            },
-          ],
           queryState: {
             age: 2,
           },
@@ -154,8 +186,14 @@ export const 基础用例: Story = {
 
         onMounted(query)
 
-        const onAdd = () => command(Commands.post)
-        const onExport = () => command(Commands.export)
+        const onAdd = () =>
+          command(Commands.post, null)
+            .then(() => console.log('post then'))
+            .catch(() => console.log('post catch'))
+        const onExport = () =>
+          command(Commands.export)
+            .then(() => console.log('onExport then'))
+            .catch(() => console.log('onExport catch'))
 
         return { tableState, queryState, formDialogState, pagination, onAdd, onExport, query, resetQuery }
       },

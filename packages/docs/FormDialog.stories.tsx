@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { OneFormDialog as Form, useFormDialog } from '../src'
-import React from 'react'
+import { OneFormDialog as Form, useFormDialog } from '@fzlw/eui-plus'
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
  * 基于 el-dialog 和 OneForm 实现 $attrs 会透传至 el-dialog

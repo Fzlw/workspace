@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { nextTick, onMounted } from 'vue'
-import React from 'react'
 import { ElPagination } from 'element-plus'
 
-import { OneTable as Table, useTable, LoadMode, Format } from '../src'
+import { OneTable as Table, useTable, LoadMode, Format } from '@fzlw/eui-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**

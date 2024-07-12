@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { onMounted } from 'vue'
-import React from 'react'
 
-import { OneTable as Table, useEditTable } from '../src'
+import { OneTable as Table, useEditTable } from '@fzlw/eui-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -49,7 +48,7 @@ export const 可编辑表格: Story = {
               label: 'Address',
               prop: 'address',
               elProps: {
-                formatter(value) {
+                formatter(value: any) {
                   return value + '-'
                 },
               },
@@ -58,7 +57,7 @@ export const 可编辑表格: Story = {
               label: 'state',
               prop: 'state',
               editable: false,
-              formatter(row) {
+              formatter(row): string {
                 return rowIsEditing(row) ? '编辑中' : '-'
               },
             },

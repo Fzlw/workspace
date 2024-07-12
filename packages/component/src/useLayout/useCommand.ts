@@ -8,6 +8,7 @@ export const useCommand = <T>(
   cb: (...args: any[]) => void,
   column?: UseTableColumn<T>
 ): UseTableColumn<T> => {
+  console.warn(`下一版本将停用 commands 和 commandColumn`)
   return {
     prop: 'operation',
     label: '操作',

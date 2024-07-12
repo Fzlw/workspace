@@ -1,12 +1,15 @@
 import { ButtonProps, ElMessageBoxOptions } from 'element-plus'
 import { VNode } from 'vue'
 import { FormDialogProps } from '../FormDialog'
+import { FormDrawerProps } from '../FormDrawer'
 
 export enum Commands {
   post,
   put,
   delete,
   export,
+  postByDrawer,
+  putByDrawer,
 }
 
 export interface CommandBaseItem extends Partial<ButtonProps> {
@@ -25,11 +28,25 @@ export interface CommandDialogItem extends CommandBaseItem {
   options?: FormDialogProps
 }
 
+export interface CommandDrawerItem extends CommandBaseItem {
+  command?: Commands.postByDrawer | Commands.putByDrawer
+  options?: FormDrawerProps
+}
+
 export interface CommandExportItem extends CommandBaseItem {
   command?: Commands.export
   options?: null
 }
 
-export type CommandItem = CommandBoxItem | CommandDialogItem | CommandExportItem
+export type CommandItem = CommandBoxItem | CommandDialogItem | CommandExportItem | CommandDrawerItem
 
 export type CommandOpt<T> = CommandItem[] | ((row: T) => CommandItem[])
+
+export type CommandOptions = {
+  [Commands.post]: FormDialogProps
+  [Commands.postByDrawer]: FormDrawerProps
+  [Commands.put]: FormDialogProps
+  [Commands.putByDrawer]: FormDrawerProps
+  [Commands.delete]: ElMessageBoxOptions
+  [Commands.export]: null
+}

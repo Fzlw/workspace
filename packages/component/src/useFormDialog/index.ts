@@ -1,6 +1,7 @@
 import { computed, ref, unref, watch } from 'vue'
 import { useForm, UseFormOptions, SubmitPost, IFormColumn as FormColumn } from '../useForm'
 import { FormDialogProps } from '../FormDialog'
+import { FormDrawerProps } from '../FormDrawer'
 
 export type UseFormDialogOptions<T> = UseFormOptions<T> & {
   post?: SubmitPost<T>
@@ -8,10 +9,12 @@ export type UseFormDialogOptions<T> = UseFormOptions<T> & {
   onOpen?: VoidFunction
 }
 
+export type DialogAndDrawer = FormDialogProps | FormDrawerProps
+
 export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
   const { formState, getModel, ...other } = useForm<T>(opts)
   const visible = ref(false)
-  const dialogProps = ref({})
+  const extProps = ref({})
 
   const submit = (post = opts.post) => {
     return other.submit(async (model) => {
@@ -24,7 +27,6 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
 
   const onUpdateModelValue = (val: boolean) => {
     visible.value = val
-    !val && (dialogProps.value = {})
   }
   const onSubmit = () => submit(opts.post)
 
@@ -35,12 +37,12 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
       submitting: formState.submitting,
       'onUpdate:modelValue': onUpdateModelValue,
       onSubmit,
-      ...dialogProps.value,
+      ...extProps.value,
     }
   })
 
-  const show = (props?: Partial<FormDialogProps> & { onSubmit?: () => Promise<void> }) => {
-    props && (dialogProps.value = props)
+  const show = (props?: Partial<DialogAndDrawer> & { onSubmit?: () => Promise<void> }) => {
+    extProps.value = props ?? {}
     visible.value = true
   }
 

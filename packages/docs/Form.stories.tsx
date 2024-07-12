@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { OneForm as Form, useForm, CustomScope } from '../src'
+import { OneForm as Form, useForm, CustomScope } from '@fzlw/eui-plus'
 import { ref, reactive, toRaw, onMounted, nextTick } from 'vue'
-import React from 'react'
 import { ElButton, ElDialog } from 'element-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
@@ -77,7 +76,7 @@ export const 基础用例: Story = {
       setup() {
         const formRef = ref<any>()
         const click = () => {
-          formRef.value?.elForm.validate((v) => {
+          formRef.value?.elForm.validate((v: boolean) => {
             console.log('valid', v)
           })
         }
