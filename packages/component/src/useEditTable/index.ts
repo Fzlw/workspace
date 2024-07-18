@@ -14,7 +14,9 @@ export interface EditTableRow {
 
 export type UseEditTableOptions<T> = UseTableOptions<T, UseEditTableColumn<T>>
 
-export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, UseEditTableColumn<T>>) => {
+export const useEditTable = <T extends EditTableRow = EditTableRow>(
+  opts: UseTableOptions<T, UseEditTableColumn<T>>
+) => {
   const { tableState, setState, ...other } = useTable<T, UseEditTableColumn<T>>({
     mapColumn(i) {
       const { formatter, editable, ...other } = i
@@ -62,8 +64,11 @@ export const useEditTable = <T extends EditTableRow>(opts: UseTableOptions<T, Us
     row._editing = true
   }
 
-  const cancelRow = (row: T) => {
-    if (rowIsAdded(row)) return delRow(row)
+  /**
+   * @param del 当 row 是新增项时是否删除此项 默认为 true
+   */
+  const cancelRow = (row: T, del = true) => {
+    if (rowIsAdded(row) && del) return delRow(row)
 
     for (const key in row._origin) {
       row[key as keyof T] = row._origin[key]

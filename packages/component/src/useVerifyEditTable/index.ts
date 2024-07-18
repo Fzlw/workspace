@@ -17,7 +17,7 @@ export interface VerifyTableState<T> {
   ref?: any
 }
 
-export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTableOptions<T>) {
+export function useVerifyEditTable<T extends EditTableRow = EditTableRow>(opts: UseVerifyEditTableOptions<T>) {
   const { tableState, editRow, delRow, cancelRow, saveRow, addRow, ...other } = useEditTable<T>({
     mapColumn(i) {
       const { formItemProps, editable, formatter, ...other } = formatFormColumn(i) as UseVerifyEditTableColumn<T>
@@ -82,10 +82,13 @@ export function useVerifyEditTable<T extends EditTableRow>(opts: UseVerifyEditTa
     delRow(row)
   }
 
-  const vCancelRow: typeof cancelRow = (row) => {
+  /**
+   * @param del 当 row 是新增项时是否删除此项 默认为 true
+   */
+  const vCancelRow: typeof cancelRow = (row, del = true) => {
     model.value = null
 
-    cancelRow(row)
+    cancelRow(row, del)
   }
 
   const vSaveRow = async (row: T): Promise<[boolean, FormValidateFailure['fields'] | null]> => {
