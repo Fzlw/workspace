@@ -1,5 +1,5 @@
-import { computed, ref, unref, watch } from 'vue'
-import { useForm, UseFormOptions, SubmitPost, IFormColumn as FormColumn } from '../useForm'
+import { computed, ref, watch } from 'vue'
+import { useForm, UseFormOptions, SubmitPost } from '../useForm'
 import { FormDialogProps } from '../FormDialog'
 import { FormDrawerProps } from '../FormDrawer'
 
@@ -60,9 +60,6 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     val ? opts.onOpen?.() : close()
   })
 
-  const forEachColumns = (cb: (i: FormColumn, index: number, arr: FormColumn[]) => void) =>
-    unref(other.originColumns).forEach(cb)
-
   return {
     ...other,
     formDialogState,
@@ -70,6 +67,5 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     hide,
     submit,
     getModel: getModel as <K extends keyof T = keyof T>(_k: K) => T[K],
-    forEachColumns,
   }
 }

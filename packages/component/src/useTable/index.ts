@@ -105,11 +105,14 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
     if (!opts.query || tableState.pending) return
 
     try {
-      tableState.pending = true
-      !disabledLoading && (tableState.loading = true)
+      if (!disabledLoading) {
+        tableState.pending = true
+        tableState.loading = true
+      }
 
       const result = await opts.query(unref(pagination))
-      const { list = [], total = 0 } = result ?? {}
+      const list = result?.list ?? []
+      const total = result?.total ?? 0
       const page = pagination.currentPage
 
       tableState.data = page === 1 || tableState.mode === LoadMode.single ? list : tableState.data.concat(list)

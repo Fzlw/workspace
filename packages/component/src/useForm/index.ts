@@ -115,21 +115,6 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
   }
 
   /**
-   * 用于快速更新表单项状态 避免 setColumn 性能问题
-   */
-  const patchColumn = (column: IFormColumn, patch?: Partial<ExcludeColumn<UseFormColumn, 'prop'>>) => {
-    if (patch) {
-      const newColumn = formatFormColumn({
-        ...patch,
-        prop: column.prop,
-        formItemProps: column.formItemProps,
-      } as UseFormColumn)
-
-      Object.assign(column, newColumn)
-    }
-  }
-
-  /**
    * 表单项的显示隐藏
    */
   const toggleColumn = (
@@ -187,27 +172,22 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    * 设置表单状态
    * isReset为true时会重置表单项
    */
-  const setModel = (obj: Partial<T>, isReset = false) => {
+  const setModel = (obj: Partial<T>, isReset = false, columnMap = {} as Record<string, Partial<UseFormColumn>>) => {
     if (isReset) {
       const keys: string[] = []
       const newCols: FormState<T>['columns'] = []
-      const newOriginCols: FormState<T>['columns'] = []
 
-      for (const i of unref(originColumns)) {
-        if (i.prop) keys.push(i.prop)
-      }
       for (const i of opts.columns) {
-        const column = formatFormColumn(i)
+        const ii = formatFormColumn({ ...i, ...columnMap[i.prop] } as any)
 
-        if (!column.hidden) newCols.push(column)
-        newOriginCols.push(column)
+        if (ii.prop) keys.push(i.prop)
+        if (!ii.hidden) newCols.push(ii as any)
       }
       for (const key in formState.model) {
         formState.model[key] = undefined as any
       }
 
       formState.columns = newCols
-      originColumns.value = newOriginCols
       // resetFields 会重置为初始值 这里只需清除验证信息即可
       setTimeout(() => formRef.value?.clearValidate(keys), 0)
     }
@@ -235,7 +215,6 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
     setModel,
     form: formRef,
     getModel,
-    patchColumn,
     originColumns,
   }
 }

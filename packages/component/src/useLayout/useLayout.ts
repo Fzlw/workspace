@@ -8,7 +8,7 @@ import { BaseResult } from '../types'
 import { shallowReactive, unref, watch } from 'vue'
 import { ElMessageBox, ElMessageBoxOptions } from 'element-plus'
 import { useCommand } from './useCommand'
-import { noop, isEmpty } from 'lodash-es'
+import { noop } from 'lodash-es'
 import { ExpandColumn } from '../useColumn'
 
 export type UseLayoutColumn = ExpandColumn<
@@ -66,6 +66,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   function command<O extends Commands>(cmd: O, row?: T | null, options?: CommandOptions[O]): Promise<void> {
     const rowT = row ?? ({} as T)
     const { promise, resolve, reject } = Promise.withResolvers<void>()
+    const columnMap: Record<UseLayoutColumn['prop'], Record<string, unknown>> = {}
 
     if (
       cmd === Commands.post ||
@@ -73,22 +74,21 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
       cmd === Commands.postByDrawer ||
       cmd === Commands.putByDrawer
     ) {
-      const map: Record<UseLayoutColumn['prop'], boolean> = {}
+      for (const i of unref(formOpera.originColumns)) {
+        if (unref(i).prop) {
+          const ii = unref(i) as UseLayoutColumn
+          const disabled = ii.disabledType?.includes(cmd)
+          const hidden = ii.hiddenType?.includes(cmd)
 
-      formOpera.forEachColumns((i) => {
-        const ii = unref(i) as UseLayoutColumn
-
-        formOpera.patchColumn(i, { disabled: ii.disabledType?.includes(cmd) })
-        ii.hiddenType?.length && (map[ii.prop] = !ii.hiddenType?.includes(cmd))
-      })
-
-      !isEmpty(map) && formOpera.toggleColumn(map)
+          columnMap[i.prop] = { disabled, hidden }
+        }
+      }
     }
 
     switch (cmd) {
       case Commands.post:
       case Commands.postByDrawer:
-        formOpera.setModel(rowT, true)
+        formOpera.setModel(rowT, true, columnMap)
         formOpera.show({
           title: '新增',
           ...(options as DialogAndDrawer),
@@ -109,7 +109,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
 
       case Commands.put:
       case Commands.putByDrawer:
-        formOpera.setModel(rowT, true)
+        formOpera.setModel(rowT, true, columnMap)
         formOpera.show({
           title: '修改',
           ...(options as DialogAndDrawer),
@@ -118,12 +118,12 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
             reject()
           },
           onSubmit: () => {
-            mixedState.puting = true
+            mixedState.putting = true
 
             return formOpera
               .submit(put)
               .then(resolve)
-              .finally(() => (mixedState.puting = false))
+              .finally(() => (mixedState.putting = false))
           },
         })
         break
@@ -188,7 +188,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
     },
   })
 
-  const query = () => queryOpera.submit(() => tableOpera.handleQuery())
+  const query = (disabledLoading?: boolean) => queryOpera.submit(() => tableOpera.handleQuery(disabledLoading))
 
   // 重置查询表单数据
   const resetQuery = () => queryOpera.setModel(qS ?? {}, true)
@@ -203,7 +203,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   const mixedState = shallowReactive({
     querying: false, // get 接口调用中
     posting: false, // post 接口调用中
-    puting: false, // put 接口调用中
+    putting: false, // put 接口调用中
     deleting: false, // delete 接口调用中
     exporting: false, // export 接口调用中
   })
