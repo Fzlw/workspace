@@ -724,16 +724,16 @@ export const 隐藏显示切换: Story = {
                 toggleColumn('opera', val === 1)
               },
             },
-            { label: 'opera', prop: 'opera' },
+            { label: 'opera', prop: 'opera', hidden: true },
           ],
           initData: {
-            show: 1,
+            show: 0,
             age: 1,
           },
         })
 
         const reset = () => {
-          setModel({ show: 1, age: 1 }, true)
+          setModel({ show: 0, age: 1 }, true)
         }
 
         return { formState, reset }

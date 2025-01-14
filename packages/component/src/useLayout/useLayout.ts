@@ -8,7 +8,7 @@ import { BaseResult } from '../types'
 import { shallowReactive, unref, watch } from 'vue'
 import { ElMessageBox, ElMessageBoxOptions } from 'element-plus'
 import { useCommand } from './useCommand'
-import { noop } from 'lodash-es'
+import { isUndefined, noop } from 'lodash-es'
 import { ExpandColumn } from '../useColumn'
 
 export type UseLayoutColumn = ExpandColumn<
@@ -66,7 +66,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   function command<O extends Commands>(cmd: O, row?: T | null, options?: CommandOptions[O]): Promise<void> {
     const rowT = row ?? ({} as T)
     const { promise, resolve, reject } = Promise.withResolvers<void>()
-    const columnMap: Record<UseLayoutColumn['prop'], Record<string, unknown>> = {}
+    const columnMap: Record<number, Record<string, unknown>> = {}
 
     if (
       cmd === Commands.post ||
@@ -74,13 +74,14 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
       cmd === Commands.postByDrawer ||
       cmd === Commands.putByDrawer
     ) {
-      for (const i of unref(formOpera.originColumns)) {
-        if (unref(i).prop) {
-          const ii = unref(i) as UseLayoutColumn
-          const disabled = ii.disabledType?.includes(cmd)
-          const hidden = ii.hiddenType?.includes(cmd)
+      for (let i = 0, len = unref(formOpera.originColumns).length; i < len; i++) {
+        const ii = unref(formOpera.originColumns)[i] as UseLayoutColumn
+        const disabled = ii.disabledType?.includes(cmd)
+        const hidden = ii.hiddenType?.includes(cmd)
 
-          columnMap[i.prop] = { disabled, hidden }
+        columnMap[i] = {
+          ...(!isUndefined(disabled) && { disabled }),
+          ...(!isUndefined(hidden) && { hidden }),
         }
       }
     }

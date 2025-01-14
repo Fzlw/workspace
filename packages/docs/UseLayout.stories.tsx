@@ -210,3 +210,64 @@ export const 基础用例: Story = {
     }
   },
 }
+
+export const 默认隐藏项: Story = {
+  args: {},
+  render: () => {
+    return {
+      components: { OneTable, ElPagination, OneFormDialog, ElButton, OneForm },
+      setup() {
+        type Row = { name: number }
+
+        const { formDialogState, command, formDialogOpera } = useLayout<Row>({
+          formColumns: [
+            {
+              rType: 'select',
+              label: 'name',
+              prop: 'name',
+              options: [
+                { value: 1, label: 1 },
+                { value: 2, label: 2 },
+              ],
+              onChange(val) {
+                formDialogOpera.toggleColumn({
+                  remark: val === 1,
+                })
+              },
+            },
+            { label: 'age', prop: 'age' },
+            { label: 'remark', prop: 'remark', hidden: true },
+          ],
+          post(_model) {
+            return new Promise<void>((r) => {
+              setTimeout(() => {
+                ElMessage.success('新增成功')
+                r()
+              }, 1000)
+            })
+          },
+          put(_model) {
+            return new Promise<void>((r) => {
+              setTimeout(() => {
+                ElMessage.success('修改成功')
+                r()
+              }, 1000)
+            })
+          },
+        })
+
+        const onAdd = () => {
+          command(Commands.post, { name: 2 })
+            .then(() => console.log('post then'))
+            .catch(() => console.log('post catch'))
+        }
+
+        return { formDialogState, onAdd }
+      },
+      template: `
+        <ElButton @click="onAdd">新增</ElButton>
+        <OneFormDialog v-bind="formDialogState" />
+      `,
+    }
+  },
+}

@@ -172,15 +172,16 @@ export function useForm<T extends object>(opts: UseFormOptions<T>) {
    * 设置表单状态
    * isReset为true时会重置表单项
    */
-  const setModel = (obj: Partial<T>, isReset = false, columnMap = {} as Record<string, Partial<UseFormColumn>>) => {
+  const setModel = (obj: Partial<T>, isReset = false, columnMap = {} as Record<number, Partial<UseFormColumn>>) => {
     if (isReset) {
       const keys: string[] = []
       const newCols: FormState<T>['columns'] = []
 
-      for (const i of opts.columns) {
-        const ii = formatFormColumn({ ...i, ...columnMap[i.prop] } as any)
+      for (let i = 0, len = opts.columns.length; i < len; i++) {
+        const col = opts.columns[i]
+        const ii = formatFormColumn({ ...col, ...columnMap[i] } as any)
 
-        if (ii.prop) keys.push(i.prop)
+        if (ii.prop) keys.push(col.prop)
         if (!ii.hidden) newCols.push(ii as any)
       }
       for (const key in formState.model) {
