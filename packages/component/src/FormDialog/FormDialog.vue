@@ -1,8 +1,9 @@
 <template>
-  <ElDialog
+  <component
     v-bind="$attrs"
+    :is="is"
     :model-value="visible"
-    @update:model-value="(value: boolean) => emit('update:modelValue', value)"
+    @update:model-value="(value) => emit('update:modelValue', value)"
   >
     <template #header>
       <slot name="header"></slot>
@@ -30,13 +31,15 @@
         </ElButton>
       </slot>
     </template>
-  </ElDialog>
+  </component>
 </template>
 
 <script setup lang="ts">
-import { ElDialog, ElButton, ButtonProps } from 'element-plus'
+import { ElDialog, ElButton, ButtonProps, ElDrawer } from 'element-plus'
 import { OneFormProps, OneForm } from '../Form'
 import { ElDialogProps } from './types'
+import { CommandRType } from '../useLayout'
+import { computed } from 'vue'
 
 export interface Props {
   visible: ElDialogProps['modelValue']
@@ -46,12 +49,17 @@ export interface Props {
   noProps?: Partial<ButtonProps>
   okProps?: Partial<ButtonProps>
   submitting?: boolean
+  rType?: CommandRType
 }
 
-const _props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   noText: '取消',
   okText: '确定',
 })
+const is = computed(() =>
+  props.rType === CommandRType.drawer || props.rType === CommandRType.afterDrawer ? ElDrawer : ElDialog
+)
+
 const emit = defineEmits<{
   (e: 'update:modelValue', data: ElDialogProps['modelValue']): void
   (e: 'submit'): void

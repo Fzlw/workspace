@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue'
 import { useForm, UseFormOptions, SubmitPost } from '../useForm'
 import { FormDialogProps } from '../FormDialog'
 import { FormDrawerProps } from '../FormDrawer'
+import { callBack } from '../utils'
 
 export type UseFormDialogOptions<T> = UseFormOptions<T> & {
   post?: SubmitPost<T>
@@ -42,7 +43,14 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
   })
 
   const show = (props?: Partial<DialogAndDrawer> & { onSubmit?: () => Promise<void> }) => {
-    extProps.value = props ?? {}
+    extProps.value = {
+      ...props,
+      onClosed() {
+        callBack((props as FormDialogProps)?.onClosed)
+        // NOTE: 避免在关闭弹窗时表单项闪烁
+        other.setModel({}, true)
+      },
+    }
     visible.value = true
   }
 
@@ -50,11 +58,7 @@ export function useFormDialog<T extends object>(opts: UseFormDialogOptions<T>) {
     visible.value = false
   }
 
-  const close = () => {
-    if (opts.onClose) return opts.onClose()
-
-    other.setModel({}, true)
-  }
+  const close = () => callBack(opts.onClose)
 
   watch(visible, (val) => {
     val ? opts.onOpen?.() : close()

@@ -3,19 +3,32 @@ import { LoadMode } from '../Table'
 import { UseTableColumn, useTable } from '../useTable'
 import { UseFormColumn, useForm } from '../useForm'
 import { useFormDialog, UseFormDialogOptions, DialogAndDrawer } from '../useFormDialog'
-import { Commands, CommandOpt, CommandOptions } from './types'
+import {
+  Commands,
+  CommandOptions,
+  CustomOptions,
+  CommandRType,
+  CommandsAndString,
+  cmdToRType,
+  defaultCmdTitle,
+  mixedKey,
+} from './types'
 import { BaseResult } from '../types'
-import { shallowReactive, unref, watch } from 'vue'
+import { isReactive, shallowReactive, unref, watch } from 'vue'
 import { ElMessageBox, ElMessageBoxOptions } from 'element-plus'
-import { useCommand } from './useCommand'
-import { isUndefined, noop } from 'lodash-es'
+import { isPlainObject, noop, set } from 'lodash-es'
 import { ExpandColumn } from '../useColumn'
+import { getColumnMap } from './utils'
+import { callBack } from '../utils'
+import { onMounted } from 'vue'
+import { FormDialogProps } from '../FormDialog'
 
 export type UseLayoutColumn = ExpandColumn<
   UseFormColumn,
   {
-    disabledType?: Commands[]
-    hiddenType?: Commands[]
+    disabledType?: CommandsAndString | CommandsAndString[]
+    showType?: CommandsAndString | CommandsAndString[]
+    hiddenType?: CommandsAndString | CommandsAndString[]
   }
 >
 
@@ -25,16 +38,18 @@ export interface UseLayoutOptions<T, Q, K> {
   put?: UseFormDialogOptions<K>['post']
   delete?: (row: T) => any
   export?: (row: T | null | undefined, query: Q, p: Pagination) => any
-  // TODO: 下一版本移除掉
-  commands?: CommandOpt<T>
-  commandColumn?: UseTableColumn<T>
+  custom?: (cmd: string, row: any, form?: any, q?: Q, p?: Pagination) => any
   columns?: UseTableColumn<T>[]
   pagination?: Pagination
   mode?: LoadMode
   queryColumns?: UseFormColumn[]
   formColumns?: UseLayoutColumn[]
+  customColumns?: UseLayoutColumn[]
   queryState?: Partial<Q>
   align?: UseTableColumn<T>['align']
+  immediate?: boolean
+  resetShouldQuery?: boolean
+  watchPageSize?: boolean
 }
 
 /**
@@ -52,125 +67,139 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
     put,
     delete: dM,
     export: eM,
+    custom,
     columns = [],
     mode,
     pagination: pa,
     queryColumns = [],
     formColumns = [],
-    commands,
-    commandColumn,
+    customColumns = [],
     queryState: qS,
     align = 'center', // 默认居中展示
+    immediate = true, // 是否立即发起请求
+    resetShouldQuery = true, // 重置查询表单时是否调用查询接口
+    watchPageSize = true,
   } = opts
 
   function command<O extends Commands>(cmd: O, row?: T | null, options?: CommandOptions[O]): Promise<void> {
     const rowT = row ?? ({} as T)
-    const { promise, resolve, reject } = Promise.withResolvers<void>()
-    const columnMap: Record<number, Record<string, unknown>> = {}
-
-    if (
-      cmd === Commands.post ||
-      cmd === Commands.put ||
-      cmd === Commands.postByDrawer ||
-      cmd === Commands.putByDrawer
-    ) {
-      for (let i = 0, len = unref(formOpera.originColumns).length; i < len; i++) {
-        const ii = unref(formOpera.originColumns)[i] as UseLayoutColumn
-        const disabled = ii.disabledType?.includes(cmd)
-        const hidden = ii.hiddenType?.includes(cmd)
-
-        columnMap[i] = {
-          ...(!isUndefined(disabled) && { disabled }),
-          ...(!isUndefined(hidden) && { hidden }),
-        }
-      }
+    const { promise, resolve, reject } = Promise.withResolvers<any>()
+    const optionCmd = (options as CustomOptions)?.cmd
+    const cmdIsCustom = cmd === Commands.custom
+    const rType = cmdIsCustom ? (options as CustomOptions)?.rType : cmdToRType[cmd]
+    const mixKey = cmdIsCustom ? optionCmd : mixedKey[cmd]
+    const start = () => {
+      set(mixedState, mixKey, true)
+      isReactive(rowT) && isPlainObject(rowT) && set(rowT, `_${mixKey}_`, true)
+    }
+    const end = () => {
+      set(mixedState, mixKey, false)
+      isReactive(rowT) && isPlainObject(rowT) && set(rowT, `_${mixKey}_`, false)
     }
 
-    switch (cmd) {
-      case Commands.post:
-      case Commands.postByDrawer:
+    switch (rType) {
+      case CommandRType.form:
+      case CommandRType.drawer: {
+        const columnMap = getColumnMap(unref(formOpera.originColumns) as UseLayoutColumn[], cmd, optionCmd)
+
         formOpera.setModel(rowT, true, columnMap)
         formOpera.show({
-          title: '新增',
+          title: defaultCmdTitle[cmd],
           ...(options as DialogAndDrawer),
+          rType,
           onClosed: () => {
-            ;(options as any)?.onClosed?.()
+            callBack((options as FormDialogProps)?.onClosed)
             reject()
           },
           onSubmit: () => {
-            mixedState.posting = true
+            start()
 
             return formOpera
-              .submit(post)
+              .submit(
+                cmd === Commands.post || cmd === Commands.postByDrawer
+                  ? post
+                  : cmd === Commands.put || cmd === Commands.putByDrawer
+                  ? put
+                  : (form) => custom?.(optionCmd, rowT, form)
+              )
               .then(resolve)
-              .finally(() => (mixedState.posting = false))
+              .finally(end)
           },
         })
         break
+      }
 
-      case Commands.put:
-      case Commands.putByDrawer:
-        formOpera.setModel(rowT, true, columnMap)
-        formOpera.show({
-          title: '修改',
-          ...(options as DialogAndDrawer),
-          onClosed: () => {
-            ;(options as any)?.onClosed?.()
-            reject()
-          },
-          onSubmit: () => {
-            mixedState.putting = true
+      case CommandRType.afterForm:
+      case CommandRType.afterDrawer: {
+        start()
 
-            return formOpera
-              .submit(put)
-              .then(resolve)
-              .finally(() => (mixedState.putting = false))
-          },
-        })
+        custom?.(optionCmd, rowT)
+          .then((data: any) => {
+            const columnMap = getColumnMap(unref(formOpera.originColumns) as UseLayoutColumn[], cmd, optionCmd)
+
+            formOpera.setModel(data ?? {}, true, columnMap)
+            formOpera.show({
+              title: defaultCmdTitle[cmd],
+              ...(options as DialogAndDrawer),
+              rType,
+              onClosed: () => {
+                callBack((options as FormDialogProps)?.onClosed)
+                reject()
+              },
+              onSubmit: () => {
+                let form: any
+
+                return formOpera.submit((val) => (form = val)).then(() => resolve(form))
+              },
+            })
+          })
+          .catch(reject)
+          .finally(end)
         break
+      }
 
-      case Commands.delete:
+      case CommandRType.messageBox:
         ElMessageBox({
           type: 'warning',
           message: '确定删除所选的数据吗？',
-          title: '确认删除',
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           showCancelButton: true,
           confirmButtonClass: 'el-button--danger',
+          title: defaultCmdTitle[cmd],
           ...(options as ElMessageBoxOptions),
         })
           .then(() => {
-            mixedState.deleting = true
+            start()
 
-            return dM?.(rowT)
+            return cmdIsCustom ? custom?.(optionCmd, rowT, null) : dM?.(rowT)
           })
           .then(resolve)
           .catch(reject)
-          .finally(() => (mixedState.deleting = false))
+          .finally(end)
         break
 
-      case Commands.export:
+      case CommandRType.none:
         Promise.resolve()
           .then(() => {
-            mixedState.exporting = true
+            start()
 
-            return eM?.(rowT, unref(queryState.model), unref(pagination))
+            return cmdIsCustom
+              ? custom?.(optionCmd, rowT, null, unref(queryState.model), unref(pagination))
+              : eM?.(rowT, unref(queryState.model), unref(pagination))
           })
           .then(resolve)
           .catch(reject)
-          .finally(() => (mixedState.exporting = false))
+          .finally(end)
         break
 
       default:
-        resolve()
+        resolve(void 0)
         break
     }
 
     return promise
   }
-
-  const commandColumns = commands ? useCommand<T>(commands, command, commandColumn) : null
 
   // 筛选
   const { formState: queryState, ...queryOpera } = useForm<Q>({
@@ -180,7 +209,7 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
 
   // 表格数据展示
   const { tableState, pagination, ...tableOpera } = useTable<T>({
-    columns: commandColumns ? columns.concat(commandColumns) : columns,
+    columns,
     mode: mode ?? LoadMode.single,
     query: get ? (p) => get(unref(queryState.model), p) : void 0,
     pagination: pa,
@@ -192,16 +221,26 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   const query = (disabledLoading?: boolean) => queryOpera.submit(() => tableOpera.handleQuery(disabledLoading))
 
   // 重置查询表单数据
-  const resetQuery = () => queryOpera.setModel(qS ?? {}, true)
+  const resetQuery = () => {
+    queryOpera.setModel(qS ?? {}, true)
+    if (resetShouldQuery) {
+      pagination.currentPage = 1
+      query()
+    }
+  }
 
   // 新增等弹窗表单
   const { formDialogState, ...formOpera } = useFormDialog<K>({
-    columns: formColumns,
+    columns: formColumns
+      .map<UseLayoutColumn>((i) => {
+        return { ...i, showType: [Commands.post, Commands.put, Commands.postByDrawer, Commands.putByDrawer] }
+      })
+      .concat(customColumns),
     post: noop,
   })
 
   // 杂项
-  const mixedState = shallowReactive({
+  const mixedState = shallowReactive<Record<string, boolean>>({
     querying: false, // get 接口调用中
     posting: false, // post 接口调用中
     putting: false, // put 接口调用中
@@ -210,10 +249,25 @@ export function useLayout<T extends object, Q extends object = Partial<T>, K ext
   })
 
   watch(
-    () => tableState.pending,
-    (val) => (mixedState.querying = val),
+    // NOTE: 当 disabledLoading=true 时页面上不应该出现 loading
+    () => tableState.loading,
+    (val) => (mixedState.querying = !!val),
     { immediate: true }
   )
+
+  watch(
+    () => pagination.pageSize,
+    () => {
+      if (watchPageSize) {
+        pagination.currentPage = 1
+        query()
+      }
+    }
+  )
+
+  onMounted(() => {
+    if (immediate) query()
+  })
 
   return {
     tableState,

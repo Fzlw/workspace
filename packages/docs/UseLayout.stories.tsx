@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { onMounted } from 'vue'
 import { ElPagination, ElMessage, ElButton } from 'element-plus'
 
-import { Format, useLayout, OneTable, Commands, OneFormDialog, OneForm } from '@fzlw/eui-plus'
+import { Format, useLayout, OneTable, Commands, OneFormDialog, OneForm, CommandRType, LayoutT } from '@fzlw/eui-plus'
 
 // More on how to set up stories at: https://storybook.js.org/docs/vue/writing-stories/introduction
 /**
@@ -30,9 +29,8 @@ const meta = {
     export: {
       description: '导出接口',
     },
-    commands: {
-      description: '操作项',
-      defaultValue: { summary: 'CommandItem[]' },
+    custom: {
+      description: '自定义方法接口',
     },
     columns: {
       description: '列表展示项',
@@ -57,6 +55,22 @@ const meta = {
     formColumns: {
       description: '弹窗条件项',
       defaultValue: { summary: '同useFormDialog的columns' },
+    },
+    customColumns: {
+      description: '弹窗或抽屉条件项',
+      defaultValue: { summary: '同useFormDialog的columns' },
+    },
+    immediate: {
+      description: '是否立即发起请求',
+      defaultValue: true,
+    },
+    resetShouldQuery: {
+      description: '重置查询表单时是否调用查询接口',
+      defaultValue: true,
+    },
+    watchPageSize: {
+      description: '是否在pageSize改变时调用查询接口',
+      defaultValue: true,
     },
   },
 } satisfies Meta
@@ -86,7 +100,7 @@ export const 基础用例: Story = {
               prop: 'opera',
               formatter(row) {
                 return (
-                  <>
+                  <div>
                     <ElButton
                       type='primary'
                       link
@@ -120,7 +134,7 @@ export const 基础用例: Story = {
                     >
                       删除
                     </ElButton>
-                  </>
+                  </div>
                 )
               },
             },
@@ -183,8 +197,6 @@ export const 基础用例: Story = {
             age: 2,
           },
         })
-
-        onMounted(query)
 
         const onAdd = () =>
           command(Commands.post, null)
@@ -266,6 +278,151 @@ export const 默认隐藏项: Story = {
       },
       template: `
         <ElButton @click="onAdd">新增</ElButton>
+        <OneFormDialog v-bind="formDialogState" />
+      `,
+    }
+  },
+}
+
+export const 管理页面: Story = {
+  args: {},
+  render: () => {
+    return {
+      components: { OneTable, ElPagination, OneFormDialog, ElButton, OneForm },
+      setup() {
+        type Row = LayoutT & { name: string }
+
+        const { queryState, tableState, formDialogState, pagination, mixedState, command, resetQuery, query } =
+          useLayout<Row>({
+            queryColumns: [{ prop: 'name', label: '名称' }],
+            columns: [
+              { prop: 'name', label: '名称' },
+              {
+                prop: 'opera',
+                label: '操作',
+                formatter(row) {
+                  const handleDetail = () => {
+                    command(Commands.custom, row, { title: '这是详情', cmd: 'detail', rType: CommandRType.afterDrawer })
+                      .then((data) => console.log('custom detail then', data))
+                      .catch(() => console.log('custom detail catch'))
+                  }
+                  const handleEdit = () => {
+                    command(Commands.putByDrawer, row, { title: '这是编辑' })
+                      .then(() => console.log('put then'))
+                      .catch(() => console.log('put catch'))
+                  }
+                  const handleExport = () => {
+                    command(Commands.export, row)
+                      .then(() => console.log('export then'))
+                      .catch(() => console.log('export catch'))
+                  }
+                  const handleDel = () => {
+                    command(Commands.delete, row, { title: '删除吗?' })
+                      .then(() => console.log('delete then'))
+                      .catch(() => console.log('delete catch'))
+                  }
+                  return (
+                    <div>
+                      <ElButton link type='primary' loading={row._detail_} onClick={handleDetail}>
+                        查看详情
+                      </ElButton>
+                      <ElButton link type='primary' loading={row._putting_} onClick={handleEdit}>
+                        编辑
+                      </ElButton>
+                      <ElButton link type='primary' loading={row._exporting_} onClick={handleExport}>
+                        导出
+                      </ElButton>
+                      <ElButton link type='danger' loading={row._deleting_} onClick={handleDel}>
+                        删除
+                      </ElButton>
+                    </div>
+                  )
+                },
+              },
+            ],
+            formColumns: [
+              { label: 'name', prop: 'name' },
+              { label: 'remark', prop: 'remark' },
+            ],
+            customColumns: [
+              { showType: 'detail', prop: 'name', label: '详情名称' },
+              { showType: 'detail', prop: 'age', label: '详情Age' },
+            ],
+            get(query, pagination) {
+              return new Promise((r) => {
+                console.log('get')
+
+                setTimeout(() => {
+                  const list = new Array(10).fill(0).map(() => ({
+                    name: `name-${pagination.currentPage}-${query.name ?? ''}`,
+                  }))
+
+                  r({ list, total: 100 })
+                }, 1000)
+              })
+            },
+            post(_model) {
+              return new Promise<void>((r) => {
+                setTimeout(() => {
+                  ElMessage.success('新增成功')
+                  r()
+                }, 1000)
+              })
+            },
+            put(_model) {
+              return new Promise<void>((r) => {
+                setTimeout(() => {
+                  ElMessage.success('修改成功')
+                  r()
+                }, 1000)
+              })
+            },
+            delete(_model) {
+              return new Promise<void>((r) => {
+                setTimeout(() => {
+                  ElMessage.success('删除成功')
+                  r()
+                }, 1000)
+              })
+            },
+            export(_model, _p) {
+              return new Promise<void>((r) => {
+                setTimeout(() => {
+                  ElMessage.success('导出成功')
+                  r()
+                }, 1000)
+              })
+            },
+            custom(cmd, row, _form) {
+              if (cmd === 'detail') {
+                return new Promise((r) => {
+                  setTimeout(() => {
+                    const data = { ...row, age: Math.random() }
+
+                    r(data)
+                  }, 1000)
+                })
+              }
+
+              //
+            },
+          })
+
+        const onAdd = () => {
+          command(Commands.post)
+            .then(() => console.log('post then'))
+            .catch(() => console.log('post catch'))
+        }
+
+        return { queryState, tableState, formDialogState, pagination, mixedState, onAdd, resetQuery, query }
+      },
+      template: `
+        <ElButton :loading="mixedState.posting" @click="onAdd">新增</ElButton>
+        <OneForm v-bind="queryState" />
+        <ElButton :loading="mixedState.querying" @click="query()">查询</ElButton>
+        <ElButton :loading="mixedState.querying" @click="resetQuery">重置</ElButton>
+        <OneTable v-bind="tableState" height=300 />
+        <ElPagination v-bind="pagination" />
         <OneFormDialog v-bind="formDialogState" />
       `,
     }

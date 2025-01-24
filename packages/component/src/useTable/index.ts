@@ -181,7 +181,7 @@ export const useTable = <T, K extends UseTableColumn<T> = UseTableColumn<T>>(opt
   }
 
   watch(
-    () => [pagination.currentPage],
+    () => pagination.currentPage,
     () => handleQuery()
   )
 
